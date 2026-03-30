@@ -97,22 +97,36 @@
                             <input type="date" id="reportDate" required onchange="updatePreview()" class="w-full p-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-500 outline-none font-bold">
                         </div>
                         <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Veículo</label>
+                            <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Veículo / Equipamento</label>
                             <select id="vehicleSelect" required onchange="handleVehicleChange()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
-                                <option value="">Selecione o veículo...</option>
+                                <option value="">Selecione...</option>
                                 <option value="Kia Bongo">Kia Bongo (Caminhão)</option>
                                 <option value="Trator">Trator</option>
+                                <option value="Roçadeira">Roçadeira</option>
                             </select>
                         </div>
                     </div>
 
+                    <div id="equipmentNumberContainer" class="hidden animate-fade-in-down">
+                        <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Identificação da Roçadeira</label>
+                        <select id="equipmentNumber" onchange="updatePreview()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
+                            <option value="">Selecione qual roçadeira...</option>
+                            <option value="1">Roçadeira 1</option>
+                            <option value="2">Roçadeira 2</option>
+                            <option value="3">Roçadeira 3</option>
+                            <option value="4">Roçadeira 4</option>
+                        </select>
+                    </div>
+
                     <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Motorista / Operador</label>
+                        <label id="driverLabelText" class="text-xs font-bold text-slate-500 uppercase mb-1 block">Motorista</label>
                         <select id="driverSelect" required onchange="handleDriverChange()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
                             <option value="">Selecione o motorista...</option>
                             <option value="Mateus Paulo">Mateus Paulo</option>
                             <option value="Silvio Brito">Silvio Brito</option>
                             <option value="Henrique Soares">Henrique Soares</option>
+                            <option value="Eduardo Souza">Eduardo Souza</option>
+                            <option value="Manoel Messias">Manoel Messias</option>
                             <option value="Outro">Outro (Digitar manualmente)</option>
                         </select>
                         
@@ -185,7 +199,7 @@
                 <div class="bg-white px-6 pt-5 shrink-0">
                     <div class="flex justify-between items-center mb-4">
                         <div>
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Veículo</span>
+                            <span id="previewVehicleLabel" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Veículo</span>
                             <span id="previewVehicle" class="text-xl font-black text-slate-800 uppercase">---</span>
                         </div>
                         <div id="previewStatus" class="px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider bg-slate-100 text-slate-400">
@@ -254,6 +268,11 @@
                 { category: "Estrutura e Segurança", items: ["Pneus / Esteiras (Pressão e Cortes)", "Lataria, Cabine e Retrovisores", "Faróis de Trabalho e Giroflex", "Pinos, Travas e Engates"] },
                 { category: "Mecânica e Manutenção", items: ["Nível de Óleo do Motor", "Nível de Óleo Hidráulico / Transmissão", "Água do Radiador e Limpeza da Tela", "Filtro de Ar Limpo", "Pontos de Graxa / Lubrificação", "Sem vazamentos visíveis"] },
                 { category: "Operação e Cabine", items: ["Painel de Instrumentos (Luzes/Avisos)", "Freios (Pedais e Estacionamento)", "Cinto de Segurança do Operador", "Tomada de Força (TDP) e Braços Hidráulicos"] }
+            ],
+            "Roçadeira": [
+                { category: "Segurança e Estrutura", items: ["Cinto de Sustentação", "Protetor da Lâmina / Fio", "Aperto de Parafusos e Porcas", "EPIs do Operador (Viseira, Perneira, etc)"] },
+                { category: "Mecânica e Motor", items: ["Nível de Combustível / Mistura 2T", "Filtro de Ar Limpo", "Vela de Ignição e Cabos", "Lubrificação da Ponteira / Engrenagem", "Sem vazamentos de combustível"] },
+                { category: "Operação", items: ["Gatilho do Acelerador e Trava", "Botão Corta-Corrente (Desliga)", "Condição da Lâmina ou Fio de Nylon", "Funcionamento na Lenta (Sem girar a lâmina)"] }
             ]
         };
 
@@ -295,11 +314,39 @@
             return selectVal;
         }
 
+        function getFullVehicleName() {
+            const baseVehicle = document.getElementById('vehicleSelect').value;
+            if (baseVehicle === 'Roçadeira') {
+                const eqNum = document.getElementById('equipmentNumber').value;
+                return eqNum ? `Roçadeira ${eqNum}` : 'Roçadeira';
+            }
+            return baseVehicle;
+        }
+
         // Quando altera o veículo, gera os campos do checklist
         function handleVehicleChange() {
             const vehicle = document.getElementById('vehicleSelect').value;
             const container = document.getElementById('checklistContainer');
             const wrapper = document.getElementById('checklistItemsWrapper');
+            const driverLabel = document.getElementById('driverLabelText');
+            const equipmentNumberContainer = document.getElementById('equipmentNumberContainer');
+            const equipmentNumber = document.getElementById('equipmentNumber');
+            
+            // Lógica dinâmica para trocar "Motorista" por "Operador"
+            if (vehicle === 'Roçadeira') {
+                driverLabel.innerText = "Operador";
+                document.getElementById('driverSelect').options[0].text = "Selecione o operador...";
+                document.getElementById('previewVehicleLabel').innerText = "Equipamento";
+                equipmentNumberContainer.classList.remove('hidden');
+                equipmentNumber.setAttribute('required', 'required');
+            } else {
+                driverLabel.innerText = "Motorista";
+                document.getElementById('driverSelect').options[0].text = "Selecione o motorista...";
+                document.getElementById('previewVehicleLabel').innerText = "Veículo";
+                equipmentNumberContainer.classList.add('hidden');
+                equipmentNumber.removeAttribute('required');
+                equipmentNumber.value = ''; // Reseta a roçadeira escolhida
+            }
             
             wrapper.innerHTML = '';
             
@@ -348,7 +395,8 @@
         // Atualiza a visualização do cartão da direita em tempo real
         function updatePreview() {
             const dateVal = document.getElementById('reportDate').value;
-            const vehicle = document.getElementById('vehicleSelect').value;
+            const baseVehicle = document.getElementById('vehicleSelect').value;
+            const vehicle = getFullVehicleName();
             const driver = getDriverName() || 'Motorista não informado';
             const obs = document.getElementById('observations').value;
 
@@ -366,7 +414,7 @@
             const previewContent = document.getElementById('previewContent');
             const previewStatus = document.getElementById('previewStatus');
 
-            if (!vehicle) {
+            if (!baseVehicle) {
                 previewContent.innerHTML = `<div class="text-center text-slate-400 text-xs italic py-10 my-auto">O checklist aparecerá aqui assim que você selecionar um veículo e iniciar o preenchimento.</div>`;
                 previewStatus.className = "px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider bg-slate-100 text-slate-400";
                 previewStatus.innerText = "Pendente";
@@ -380,7 +428,7 @@
             // Layout dinâmico que se ajusta ao conteúdo, sem esticar os itens
             let checklistResultsHtml = `<div class="flex flex-col gap-4 w-full">`;
             
-            checklistData[vehicle].forEach((group, groupIdx) => {
+            checklistData[baseVehicle].forEach((group, groupIdx) => {
                 checklistResultsHtml += `<div class="bg-slate-50 rounded-xl p-4 border border-slate-200 shadow-sm"><h4 class="text-[11px] font-black text-slate-400 uppercase mb-3">${group.category}</h4><ul class="space-y-2.5">`;
                 
                 group.items.forEach((item, itemIdx) => {
@@ -606,7 +654,8 @@
                     }
                 });
 
-                const vehicle = document.getElementById('vehicleSelect').value;
+                const baseVehicle = document.getElementById('vehicleSelect').value;
+                const vehicle = getFullVehicleName();
                 const driver = getDriverName();
                 const dateVal = document.getElementById('reportDate').value;
                 const obs = document.getElementById('observations').value;
@@ -621,7 +670,7 @@
                 let allItemsList = []; // Alterado para armazenar TODOS os itens verificados
                 let hasIssues = false;
                 
-                checklistData[vehicle].forEach((group, groupIdx) => {
+                checklistData[baseVehicle].forEach((group, groupIdx) => {
                     let groupNokText = "";
                     let groupHasNok = false;
                     
@@ -659,9 +708,12 @@
 
                 const statusLabel = hasIssues ? "🔴 *REQUER MANUTENÇÃO*" : "🟢 *APTO PARA USO (Tudo OK)*";
                 
-                let shareText = `📋 *Checklist de Veículo SPG*\n\n`;
-                shareText += `*Veículo:* ${vehicle}\n`;
-                shareText += `*Motorista:* ${driver}\n`;
+                const roleName = baseVehicle === 'Roçadeira' ? 'Operador' : 'Motorista';
+                const vehicleTypeName = baseVehicle === 'Roçadeira' ? 'Equipamento' : 'Veículo';
+                
+                let shareText = `📋 *Checklist de ${vehicleTypeName} SPG*\n\n`;
+                shareText += `*${vehicleTypeName}:* ${vehicle}\n`;
+                shareText += `*${roleName}:* ${driver}\n`;
                 shareText += `*Data:* ${dateObj.toLocaleDateString('pt-BR')}\n`;
                 shareText += `*Status:* ${statusLabel}\n`;
                 
