@@ -104,18 +104,15 @@
                                 <option value="Kia Bongo">Kia Bongo (Caminhão)</option>
                                 <option value="Trator">Trator</option>
                                 <option value="Roçadeira">Roçadeira</option>
+                                <option value="Carrinho de Pulverização">Carrinho de Pulverização Agrícola</option>
                             </select>
                         </div>
                     </div>
 
                     <div id="equipmentNumberContainer" class="hidden animate-fade-in-down">
-                        <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Identificação da Roçadeira</label>
+                        <label id="equipmentLabelText" class="text-xs font-bold text-slate-500 uppercase mb-1 block">Identificação do Equipamento</label>
                         <select id="equipmentNumber" onchange="updatePreview()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
-                            <option value="">Selecione qual roçadeira...</option>
-                            <option value="1">Roçadeira 1</option>
-                            <option value="2">Roçadeira 2</option>
-                            <option value="3">Roçadeira 3</option>
-                            <option value="4">Roçadeira 4</option>
+                            <option value="">Selecione a identificação...</option>
                         </select>
                     </div>
 
@@ -128,6 +125,10 @@
                             <option value="Henrique Soares">Henrique Soares</option>
                             <option value="Eduardo Souza">Eduardo Souza</option>
                             <option value="Manoel Messias">Manoel Messias</option>
+                            <option value="Erisvaldo Camelo">Erisvaldo Camelo</option>
+                            <option value="Mateus Lopes">Mateus Lopes</option>
+                            <option value="Isaac de Oliveira">Isaac de Oliveira</option>
+                            <option value="Jucivan Xavier">Jucivan Xavier</option>
                             <option value="Outro">Outro (Digitar manualmente)</option>
                         </select>
                         
@@ -274,6 +275,11 @@
                 { category: "Segurança e Estrutura", items: ["Cinto de Sustentação", "Protetor da Lâmina / Fio", "Aperto de Parafusos e Porcas", "EPIs do Operador (Viseira, Perneira, etc)"] },
                 { category: "Mecânica e Motor", items: ["Nível de Combustível / Mistura 2T", "Filtro de Ar Limpo", "Vela de Ignição e Cabos", "Lubrificação da Ponteira / Engrenagem", "Sem vazamentos de combustível"] },
                 { category: "Operação", items: ["Gatilho do Acelerador e Trava", "Botão Corta-Corrente (Desliga)", "Condição da Lâmina ou Fio de Nylon", "Funcionamento na Lenta (Sem girar a lâmina)"] }
+            ],
+            "Carrinho de Pulverização": [
+                { category: "Estrutura e Mobilidade", items: ["Pneus e Câmaras de ar (Calibragem e Cortes)", "Chassi e Estrutura (Sem trincas ou quebras)", "Eixos e Rolamentos (Lubrificação e Folga)"] },
+                { category: "Sistema de Pulverização", items: ["Tanque e Tampa (Sem vazamentos/furos)", "Mangueiras e Conexões (Sem vazamentos)", "Bicos Pulverizadores (Limpos e Vazão uniforme)", "Filtros principal e de linha (Limpos)"] },
+                { category: "Motor e Bomba", items: ["Nível de Óleo e Combustível", "Correias e Polias (Tensão e Desgaste)", "Lança de Pulverização e Gatilho (Funcionamento)", "Sem vazamentos no conjunto da bomba"] }
             ]
         };
 
@@ -317,9 +323,9 @@
 
         function getFullVehicleName() {
             const baseVehicle = document.getElementById('vehicleSelect').value;
-            if (baseVehicle === 'Roçadeira') {
-                const eqNum = document.getElementById('equipmentNumber').value;
-                return eqNum ? `Roçadeira ${eqNum}` : 'Roçadeira';
+            if (baseVehicle === 'Roçadeira' || baseVehicle === 'Carrinho de Pulverização') {
+                const eqValue = document.getElementById('equipmentNumber').value;
+                return eqValue ? eqValue : baseVehicle;
             }
             return baseVehicle;
         }
@@ -332,21 +338,45 @@
             const driverLabel = document.getElementById('driverLabelText');
             const equipmentNumberContainer = document.getElementById('equipmentNumberContainer');
             const equipmentNumber = document.getElementById('equipmentNumber');
+            const equipmentLabel = document.getElementById('equipmentLabelText');
             
             // Lógica dinâmica para trocar "Motorista" por "Operador"
-            if (vehicle === 'Roçadeira') {
+            const isEquipment = vehicle === 'Roçadeira' || vehicle === 'Carrinho de Pulverização';
+            
+            if (isEquipment) {
                 driverLabel.innerText = "Operador";
                 document.getElementById('driverSelect').options[0].text = "Selecione o operador...";
                 document.getElementById('previewVehicleLabel').innerText = "Equipamento";
+                
                 equipmentNumberContainer.classList.remove('hidden');
                 equipmentNumber.setAttribute('required', 'required');
+                
+                // Preenche as opções do select com base no equipamento escolhido
+                equipmentNumber.innerHTML = '<option value="">Selecione a identificação...</option>';
+                if (vehicle === 'Roçadeira') {
+                    equipmentLabel.innerText = "Identificação da Roçadeira";
+                    equipmentNumber.innerHTML += `
+                        <option value="Roçadeira - Toyama TBC63-1">Roçadeira - Toyama TBC63-1</option>
+                        <option value="Roçadeira - Toyama TBC63-2">Roçadeira - Toyama TBC63-2</option>
+                        <option value="Roçadeira - Toyama RT52LB-3">Roçadeira - Toyama RT52LB-3</option>
+                        <option value="Roçadeira - Toyama TBC43X-4">Roçadeira - Toyama TBC43X-4</option>
+                    `;
+                } else if (vehicle === 'Carrinho de Pulverização') {
+                    equipmentLabel.innerText = "Identificação do Carrinho";
+                    equipmentNumber.innerHTML += `
+                        <option value="Carrinho 1">Carrinho 1</option>
+                        <option value="Carrinho 2">Carrinho 2</option>
+                    `;
+                }
             } else {
                 driverLabel.innerText = "Motorista";
                 document.getElementById('driverSelect').options[0].text = "Selecione o motorista...";
                 document.getElementById('previewVehicleLabel').innerText = "Veículo";
+                
                 equipmentNumberContainer.classList.add('hidden');
                 equipmentNumber.removeAttribute('required');
-                equipmentNumber.value = ''; // Reseta a roçadeira escolhida
+                equipmentNumber.innerHTML = '<option value="">Selecione...</option>';
+                equipmentNumber.value = ''; // Reseta a identificação escolhida
             }
             
             wrapper.innerHTML = '';
@@ -709,8 +739,8 @@
 
                 const statusLabel = hasIssues ? "🔴 *REQUER MANUTENÇÃO*" : "🟢 *APTO PARA USO (Tudo OK)*";
                 
-                const roleName = baseVehicle === 'Roçadeira' ? 'Operador' : 'Motorista';
-                const vehicleTypeName = baseVehicle === 'Roçadeira' ? 'Equipamento' : 'Veículo';
+                const roleName = (baseVehicle === 'Roçadeira' || baseVehicle === 'Carrinho de Pulverização') ? 'Operador' : 'Motorista';
+                const vehicleTypeName = (baseVehicle === 'Roçadeira' || baseVehicle === 'Carrinho de Pulverização') ? 'Equipamento' : 'Veículo';
                 
                 let shareText = `📋 *Checklist de ${vehicleTypeName} SPG*\n\n`;
                 shareText += `*${vehicleTypeName}:* ${vehicle}\n`;
