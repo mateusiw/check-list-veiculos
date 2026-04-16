@@ -283,6 +283,71 @@
             ]
         };
 
+        // Traduz itens com negativa dupla para uma frase clara de defeito
+        function getFriendlyDefectName(item) {
+            const friendlyNames = {
+                // Kia Bongo (Caminhão)
+                "Pneus, Calibragem e Estepe": "Problema nos pneus, calibragem ou estepe",
+                "Lataria, Vidros e Retrovisores": "Avaria na lataria, vidros ou retrovisores",
+                "Faróis, Lanternas, Setas e Luz de Ré": "Lâmpadas queimadas ou lanternas danificadas",
+                "Limpador de Para-brisa e Fluido": "Problema no limpador ou falta de fluido",
+                "Placas legíveis e Travas da carroceria": "Placas ilegíveis ou defeito nas travas da carroceria",
+                "Nível de Óleo do Motor": "Nível de óleo do motor baixo ou irregular",
+                "Água do Radiador": "Nível de água do radiador baixo",
+                "Fluido de Freio e Embreagem": "Fluido de freio/embreagem baixo ou vazando",
+                "Bateria (Cabos e Fixação)": "Problema na bateria (fixação frouxa ou cabos oxidados)",
+                "Sem vazamentos aparentes": "Vazamento de fluido identificado",
+                "Luzes do Painel (Sem alertas de erro)": "Luz de alerta acesa no painel",
+                "Buzina e Cintos de Segurança": "Problema na buzina ou cinto de segurança",
+                "Freios (Pedal e Mão)": "Defeito nos freios (pedal ou freio de mão)",
+                "Kit Segurança (Triângulo, Macaco, Chave)": "Falta de item no Kit de Segurança",
+                "Documentação do Veículo e Limpeza": "Documentação irregular ou veículo sujo",
+
+                // Trator
+                "Pneus / Esteiras (Pressão e Cortes)": "Pneus/Esteiras com baixa pressão ou cortes",
+                "Lataria, Cabine e Retrovisores": "Avaria na lataria, cabine ou retrovisores",
+                "Faróis de Trabalho e Giroflex": "Faróis de trabalho ou giroflex com defeito",
+                "Pinos, Travas e Engates": "Pinos, travas ou engates danificados/faltando",
+                "Nível de Óleo Hidráulico / Transmissão": "Óleo hidráulico/transmissão baixo",
+                "Água do Radiador e Limpeza da Tela": "Água do radiador baixa ou tela suja",
+                "Filtro de Ar Limpo": "Filtro de ar sujo ou obstruído",
+                "Pontos de Graxa / Lubrificação": "Falta de graxa/lubrificação em pontos cruciais",
+                "Sem vazamentos visíveis": "Vazamento identificado no equipamento",
+                "Painel de Instrumentos (Luzes/Avisos)": "Aviso de erro no painel de instrumentos",
+                "Freios (Pedais e Estacionamento)": "Defeito nos freios (pedais ou estacionamento)",
+                "Cinto de Segurança do Operador": "Cinto de segurança do operador com defeito",
+                "Tomada de Força (TDP) e Braços Hidráulicos": "Defeito na Tomada de Força (TDP) ou braços",
+
+                // Roçadeira
+                "Cinto de Sustentação": "Cinto de sustentação rasgado ou quebrado",
+                "Protetor da Lâmina / Fio": "Protetor da lâmina/fio quebrado ou faltando",
+                "Aperto de Parafusos e Porcas": "Parafusos/porcas frouxos ou faltando",
+                "EPIs do Operador (Viseira, Perneira, etc)": "Falta de EPIs ou EPIs com defeito",
+                "Nível de Combustível / Mistura 2T": "Combustível/mistura 2T irregular",
+                "Vela de Ignição e Cabos": "Problema na vela de ignição ou cabos",
+                "Lubrificação da Ponteira / Engrenagem": "Falta de lubrificação na ponteira/engrenagem",
+                "Sem vazamentos de combustível": "Vazamento de combustível identificado",
+                "Gatilho do Acelerador e Trava": "Defeito no gatilho do acelerador ou trava",
+                "Botão Corta-Corrente (Desliga)": "Botão corta-corrente (desliga) com defeito",
+                "Condição da Lâmina ou Fio de Nylon": "Lâmina danificada ou falta de fio de nylon",
+                "Funcionamento na Lenta (Sem girar a lâmina)": "Problema na lenta (lâmina gira ou motor morre)",
+
+                // Máquina de Pulverizar
+                "Pneus e Câmaras de ar (Calibragem e Cortes)": "Pneus/câmaras com baixa pressão ou cortes",
+                "Chassi e Estrutura (Sem trincas ou quebras)": "Trincas ou quebras identificadas no chassi",
+                "Eixos e Rolamentos (Lubrificação e Folga)": "Folga ou falta de lubrificação nos eixos",
+                "Tanque e Tampa (Sem vazamentos/furos)": "Vazamento ou furo no tanque/tampa",
+                "Mangueiras e Conexões (Sem vazamentos)": "Vazamento nas mangueiras ou conexões",
+                "Bicos Pulverizadores (Limpos e Vazão uniforme)": "Bicos entupidos, sujos ou com vazão irregular",
+                "Filtros principal e de linha (Limpos)": "Filtros principal/linha sujos ou obstruídos",
+                "Nível de Óleo e Combustível": "Nível de óleo do motor ou combustível baixo",
+                "Correias e Polias (Tensão e Desgaste)": "Correias/polias frouxas ou desgastadas",
+                "Lança de Pulverização e Gatilho (Funcionamento)": "Defeito na lança ou gatilho de pulverização",
+                "Sem vazamentos no conjunto da bomba": "Vazamento no conjunto da bomba"
+            };
+            return friendlyNames[item] || item;
+        }
+
         let currentPhotos = [];
 
         // Inicialização
@@ -484,7 +549,7 @@
                         checklistResultsHtml += `
                             <li class="flex items-start gap-3 text-sm font-bold text-red-600 bg-red-50 p-2 rounded-lg border border-red-100">
                                 <i data-lucide="x" class="w-5 h-5 shrink-0 stroke-[3]"></i>
-                                <span>${item}</span>
+                                <span>${getFriendlyDefectName(item)}</span>
                             </li>`;
                     }
                 });
@@ -712,20 +777,23 @@
                             if (checked.value === 'NOK') {
                                 hasIssues = true;
                                 groupHasNok = true;
-                                groupNokText += `\n❌ NOK - ${item}`;
+                                const defectText = getFriendlyDefectName(item);
+                                groupNokText += `\n❌ ${defectText}`;
                                 
                                 // Adiciona o item NOK na lista para a planilha
                                 allItemsList.push({
                                     category: group.category,
                                     item: item,
-                                    condition: "NOK"
+                                    condition: "NOK",
+                                    friendlyName: defectText
                                 });
                             } else {
                                 // Adiciona o item OK na lista para a planilha
                                 allItemsList.push({
                                     category: group.category,
                                     item: item,
-                                    condition: "OK"
+                                    condition: "OK",
+                                    friendlyName: item
                                 });
                             }
                         }
@@ -771,7 +839,7 @@
                         status: itemData.condition === 'NOK' ? "REQUER MANUTENÇÃO" : "APTO PARA USO",
                         condition: itemData.condition, // "OK" ou "NOK" puros
                         category: itemData.category,
-                        defectItem: itemData.condition === 'NOK' ? itemData.item : "-", // Preenche só se for defeito
+                        defectItem: itemData.condition === 'NOK' ? itemData.friendlyName : "-", // Preenche só se for defeito
                         okItem: itemData.condition === 'OK' ? itemData.item : "-",      // Preenche só se for OK
                         observations: index === 0 ? (obs.trim() || "Nenhuma") : "-"     // Coloca observação só na 1ª linha
                     });
