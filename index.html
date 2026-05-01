@@ -105,6 +105,7 @@
                                 <option value="Trator">Trator</option>
                                 <option value="Roçadeira">Roçadeira</option>
                                 <option value="Máquina de Pulverizar">Máquina de Pulverizar</option>
+                                <option value="Sistema de Fertirrigação">Sistema de Fertirrigação</option>
                             </select>
                         </div>
                     </div>
@@ -131,6 +132,10 @@
                             <option value="Jucivan Xavier">Jucivan Xavier</option>
                             <option value="Ribamar Chaves">Ribamar Chaves</option>
                             <option value="Antonio Alan">Antonio Alan</option>
+                            <option value="Guilherme Ramos">Guilherme Ramos</option>
+                            <option value="Lucas Rodrigues">Lucas Rodrigues</option>
+                            <option value="Hugo Melo">Hugo Melo</option>
+                            <option value="Marcelo Oliveira">Marcelo Oliveira</option>
                             <option value="Outro">Outro (Digitar manualmente)</option>
                         </select>
                         
@@ -250,6 +255,44 @@
         </div>
     </div>
 
+    <!-- MODAL DE CARREGAMENTO -->
+    <div id="loadingModal" class="fixed inset-0 bg-black/60 z-[80] hidden flex justify-center items-center backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 w-11/12 max-w-sm transform transition-all scale-100 text-center flex flex-col items-center">
+            <div class="flex items-center justify-center mb-5">
+                <i data-lucide="loader-2" class="h-12 w-12 text-[#0284c7] animate-spin"></i>
+            </div>
+            
+            <h3 class="text-xl font-black text-slate-800 mb-2">Enviando Dados...</h3>
+            <p class="text-sm text-slate-500 leading-relaxed font-medium">
+                Aguarde, processando as informações e salvando na planilha.
+            </p>
+        </div>
+    </div>
+
+    <!-- MODAL DE SUCESSO E COMPARTILHAMENTO -->
+    <div id="successModal" class="fixed inset-0 bg-black/60 z-[70] hidden flex justify-center items-center backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 w-11/12 max-w-sm transform transition-all scale-100 text-center flex flex-col items-center">
+            <div class="flex items-center justify-center h-16 w-16 rounded-full bg-green-50 mb-5">
+                <i data-lucide="check-circle-2" class="h-10 w-10 text-green-500"></i>
+            </div>
+            
+            <h3 class="text-2xl font-black text-slate-800 mb-2">Tudo Pronto!</h3>
+            <p class="text-sm text-slate-500 mb-8 leading-relaxed font-medium">
+                Os dados foram processados e registrados com sucesso.<br><br>
+                Clique abaixo para abrir o WhatsApp.
+            </p>
+            
+            <div class="w-full flex flex-col gap-3">
+                <button onclick="executeShare()" class="w-full flex justify-center items-center gap-2 px-4 py-3 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-sky-600/20 active:scale-95 uppercase">
+                    <i data-lucide="share-2" class="w-4 h-4"></i> Compartilhar
+                </button>
+                <button onclick="hideSuccessModal()" class="w-full px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-sm transition-colors uppercase">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE MENSAGEM -->
     <div id="messageModal" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-center items-center backdrop-blur-sm transition-opacity duration-300">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-11/12 max-w-sm transform transition-all scale-100 text-center">
@@ -282,6 +325,11 @@
                 { category: "Estrutura e Mobilidade", items: ["Pneus e Câmaras de ar (Calibragem e Cortes)", "Chassi e Estrutura (Sem trincas ou quebras)", "Eixos e Rolamentos (Lubrificação e Folga)"] },
                 { category: "Sistema de Pulverização", items: ["Tanque e Tampa (Sem vazamentos/furos)", "Mangueiras e Conexões (Sem vazamentos)", "Bicos Pulverizadores (Limpos e Vazão uniforme)", "Filtros principal e de linha (Limpos)"] },
                 { category: "Motor e Bomba", items: ["Nível de Óleo e Combustível", "Correias e Polias (Tensão e Desgaste)", "Lança de Pulverização e Gatilho (Funcionamento)", "Sem vazamentos no conjunto da bomba"] }
+            ],
+            "Sistema de Fertirrigação": [
+                { category: "Painel e Controle", items: ["Controlador e Conexão Wi-Fi (Ligado, sem erros e sinal estável)"] },
+                { category: "Sensores e Dosagem", items: ["Sensores de EC/pH (Limpos e calibrados)", "Bombas Dosadoras e Mangueiras (Girando livre, sem obstruções)"] },
+                { category: "Estrutura e Hidráulica", items: ["Filtros de Discos e Registros (Limpos e operantes)", "Válvulas Solenoides (Testadas via celular/painel)", "Tubulações, Caixas e Casa de Adubos (Sem vazamentos)"] }
             ]
         };
 
@@ -345,7 +393,15 @@
                 "Nível de Óleo e Combustível": "Nível de óleo do motor ou combustível baixo",
                 "Correias e Polias (Tensão e Desgaste)": "Correias/polias frouxas ou desgastadas",
                 "Lança de Pulverização e Gatilho (Funcionamento)": "Defeito na lança ou gatilho de pulverização",
-                "Sem vazamentos no conjunto da bomba": "Vazamento no conjunto da bomba"
+                "Sem vazamentos no conjunto da bomba": "Vazamento no conjunto da bomba",
+
+                // Sistema de Fertirrigação
+                "Controlador e Conexão Wi-Fi (Ligado, sem erros e sinal estável)": "Problema no Controlador ou falha no sinal Wi-Fi",
+                "Sensores de EC/pH (Limpos e calibrados)": "Sensores de EC/pH sujos ou descalibrados",
+                "Bombas Dosadoras e Mangueiras (Girando livre, sem obstruções)": "Problema nas Bombas Dosadoras ou mangueiras obstruídas/ressecadas",
+                "Filtros de Discos e Registros (Limpos e operantes)": "Filtros de discos sujos ou registros inoperantes",
+                "Válvulas Solenoides (Testadas via celular/painel)": "Falha na abertura/fechamento das Válvulas Solenoides",
+                "Tubulações, Caixas e Casa de Adubos (Sem vazamentos)": "Vazamentos nas tubulações, caixas ou casa de adubos"
             };
             return friendlyNames[item] || item;
         }
@@ -390,7 +446,7 @@
 
         function getFullVehicleName() {
             const baseVehicle = document.getElementById('vehicleSelect').value;
-            if (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar') {
+            if (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar' || baseVehicle === 'Sistema de Fertirrigação') {
                 const eqValue = document.getElementById('equipmentNumber').value;
                 return eqValue ? eqValue : baseVehicle;
             }
@@ -408,7 +464,7 @@
             const equipmentLabel = document.getElementById('equipmentLabelText');
             
             // Lógica dinâmica para trocar "Motorista" por "Operador"
-            const isEquipment = vehicle === 'Roçadeira' || vehicle === 'Máquina de Pulverizar';
+            const isEquipment = vehicle === 'Roçadeira' || vehicle === 'Máquina de Pulverizar' || vehicle === 'Sistema de Fertirrigação';
             
             if (isEquipment) {
                 driverLabel.innerText = "Operador";
@@ -427,12 +483,18 @@
                         <option value="Roçadeira - Toyama TBC63-2">Roçadeira - Toyama TBC63-2</option>
                         <option value="Roçadeira - Toyama RT52LB-3">Roçadeira - Toyama RT52LB-3</option>
                         <option value="Roçadeira - Toyama TBC43X-4">Roçadeira - Toyama TBC43X-4</option>
+                        <option value="Roçadeira - Vonder RGO330-1">Roçadeira - Vonder RGO330-1</option>
                     `;
                 } else if (vehicle === 'Máquina de Pulverizar') {
                     equipmentLabel.innerText = "Identificação da Máquina";
                     equipmentNumber.innerHTML += `
                         <option value="Máquina de Pulverizar - FOSPG-1">Máquina de Pulverizar - FOSPG-1</option>
                         <option value="Máquina de Pulverizar - FOSPG-2">Máquina de Pulverizar - FOSPG-2</option>
+                    `;
+                } else if (vehicle === 'Sistema de Fertirrigação') {
+                    equipmentLabel.innerText = "Identificação do Sistema";
+                    equipmentNumber.innerHTML += `
+                        <option value="Sistema de Fertirrigação - Iponia">Sistema de Fertirrigação - Iponia</option>
                     `;
                 }
             } else {
@@ -703,19 +765,32 @@
         
         function executeSend() { 
             hideConfirmModal(); 
-            downloadAndShare(); 
+            processAndSave(); 
         }
 
         let isProcessingShare = false;
+        let preparedShareData = null;
 
-        async function downloadAndShare() {
+        function showLoadingModal() {
+            document.getElementById('loadingModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function hideLoadingModal() {
+            document.getElementById('loadingModal').classList.add('hidden');
+        }
+
+        async function processAndSave() {
             if (isProcessingShare) return;
             isProcessingShare = true;
 
             const element = document.getElementById('report-card');
             const btnSpan = document.querySelector('button[onclick="confirmBeforeSend()"] span.hidden.sm\\:inline') || document.querySelector('button[onclick="confirmBeforeSend()"] span');
             const originalText = btnSpan.innerText; 
-            btnSpan.innerText = "Gerando Imagem...";
+            btnSpan.innerText = "Processando...";
+            
+            // Exibe o modal de carregamento imediatamente
+            showLoadingModal();
             
             try {
                 // Preload de imagens
@@ -809,8 +884,8 @@
 
                 const statusLabel = hasIssues ? "🔴 *REQUER MANUTENÇÃO*" : "🟢 *APTO PARA USO (Tudo OK)*";
                 
-                const roleName = (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar') ? 'Operador' : 'Motorista';
-                const vehicleTypeName = (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar') ? 'Equipamento' : 'Veículo';
+                const roleName = (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar' || baseVehicle === 'Sistema de Fertirrigação') ? 'Operador' : 'Motorista';
+                const vehicleTypeName = (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar' || baseVehicle === 'Sistema de Fertirrigação') ? 'Equipamento' : 'Veículo';
                 
                 let shareText = `📋 *Checklist de ${vehicleTypeName} SPG*\n\n`;
                 shareText += `*${vehicleTypeName}:* ${vehicle}\n`;
@@ -847,30 +922,56 @@
                     });
                 });
                 
-                // Dispara o envio para a planilha em segundo plano
-                sendDataToGoogleSheets(payload);
+                // Dispara o envio para a planilha e aguarda finalizar (dá o tempo do Apps Script acordar)
+                await sendDataToGoogleSheets(payload);
 
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
                 const file = new File([blob], filename, { type: 'image/png' });
 
-                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { 
-                    try {
-                        await navigator.share({ files: [file], title: filename, text: shareText }); 
-                    } catch (shareErr) {
-                        console.log("Compartilhamento cancelado ou falhou:", shareErr);
-                    }
-                } else { 
-                    downloadFile(canvas.toDataURL('image/png'), filename); 
-                    setTimeout(() => { window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank'); }, 1500); 
-                }
+                // Guarda os dados gerados para usar no clique do "Compartilhar"
+                preparedShareData = {
+                    file: file,
+                    filename: filename,
+                    shareText: shareText,
+                    dataUrl: canvas.toDataURL('image/png')
+                };
+
+                // Esconde o modal de loading e exibe o de sucesso
+                hideLoadingModal();
+                document.getElementById('successModal').classList.remove('hidden');
+                lucide.createIcons();
+
             } catch (err) { 
                 console.error(err);
-                showMessageModal('Erro', 'Falha ao gerar imagem.', 'error'); 
+                hideLoadingModal();
+                showMessageModal('Erro', 'Falha ao processar e salvar os dados.', 'error'); 
             } finally { 
                 if(btnSpan) btnSpan.innerText = originalText; 
                 isProcessingShare = false;
             }
         }
+
+        async function executeShare() {
+            if (!preparedShareData) return;
+            const { file, filename, shareText, dataUrl } = preparedShareData;
+            
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { 
+                try {
+                    await navigator.share({ files: [file], title: filename, text: shareText }); 
+                    hideSuccessModal();
+                } catch (shareErr) {
+                    console.log("Compartilhamento cancelado ou falhou:", shareErr);
+                }
+            } else { 
+                downloadFile(dataUrl, filename); 
+                setTimeout(() => { 
+                    window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank'); 
+                    hideSuccessModal();
+                }, 1500); 
+            }
+        }
+
+        function hideSuccessModal() { document.getElementById('successModal').classList.add('hidden'); }
 
         async function sendDataToGoogleSheets(payload) {
             // URL configurada do Apps Script
