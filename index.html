@@ -103,6 +103,7 @@
                                 <option value="">Selecione...</option>
                                 <option value="Kia Bongo">Kia Bongo (Caminhão)</option>
                                 <option value="Trator">Trator</option>
+                                <option value="Equipamentos do Trator">Equipamentos do Trator</option>
                                 <option value="Roçadeira">Roçadeira</option>
                                 <option value="Máquina de Pulverizar">Máquina de Pulverizar</option>
                                 <option value="Sistema de Fertirrigação">Sistema de Fertirrigação</option>
@@ -112,7 +113,7 @@
 
                     <div id="equipmentNumberContainer" class="hidden animate-fade-in-down">
                         <label id="equipmentLabelText" class="text-xs font-bold text-slate-500 uppercase mb-1 block">Identificação do Equipamento</label>
-                        <select id="equipmentNumber" onchange="updatePreview()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
+                        <select id="equipmentNumber" onchange="handleEquipmentChange()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
                             <option value="">Selecione a identificação...</option>
                         </select>
                     </div>
@@ -330,6 +331,25 @@
                 { category: "Painel e Controle", items: ["Controlador e Conexão Wi-Fi (Ligado, sem erros e sinal estável)"] },
                 { category: "Sensores e Dosagem", items: ["Sensores de EC/pH (Limpos e calibrados)", "Bombas Dosadoras e Mangueiras (Girando livre, sem obstruções)"] },
                 { category: "Estrutura e Hidráulica", items: ["Filtros de Discos e Registros (Limpos e operantes)", "Válvulas Solenoides (Testadas via celular/painel)", "Tubulações, Caixas e Casa de Adubos (Sem vazamentos)"] }
+            ],
+            "Roçadeira Trator": [
+                { category: "Estrutura e Segurança", items: ["Pinos, travas de engate e correntes estabilizadoras", "Patins laterais (Regulagem de altura e desgaste)", "Saia de proteção (Borracha ou corrente contra pedras)"] },
+                { category: "Transmissão", items: ["Protetor do cardan, correntes de segurança e cruzetas (Lubrificação)", "Caixa multiplicadora (Nível de óleo, vazamentos e respiro desobstruído)"] },
+                { category: "Corte", items: ["Facas/Lâminas (Desgaste, quebras, aperto dos parafusos e giro livre)"] }
+            ],
+            "Grade Arado": [
+                { category: "Estrutura", items: ["Chassi central, seções e engates (Trincas e soldas)", "Limpadores dos discos (Regulagem, tortos ou faltando)", "Mangueiras e cilindros hidráulicos (Vazamentos - se aplicável)"] },
+                { category: "Eixo e Discos", items: ["Discos (Desgaste, trincas ou quebras)", "Parafusos do eixo das seções (Aperto geral)", "Mancais de atrito/rolamento (Folga excessiva e lubrificação)"] }
+            ],
+            "Enxada Rotativa": [
+                { category: "Estrutura e Segurança", items: ["Pinos, travas de engate e tampa traseira niveladora", "Patins niveladores laterais (Regulagem e desgaste)", "Rotor e flanges (Trincas ou empenamentos)"] },
+                { category: "Transmissão", items: ["Cardan com embreagem de fricção ou pino fusível (Protetor e cruzetas)", "Caixa de transmissão central (Nível de óleo e vazamentos)", "Transmissão lateral [corrente/engrenagem] (Tensão, óleo e vazamentos)"] },
+                { category: "Corte", items: ["Lâminas/Enxadas (Desgaste, tortas, quebradas e aperto dos parafusos)"] }
+            ],
+            "Carreta Agrícola": [
+                { category: "Estrutura de Madeira", items: ["Assoalho e tampas laterais (Tábuas quebradas ou soltas)", "Travas e dobradiças das tampas"] },
+                { category: "Chassi e Engate", items: ["Chassi principal (Trincas ou soldas quebradas)", "Cabeçalho, pino de engate e trava de segurança"] },
+                { category: "Rodado", items: ["Pneus e Câmaras (Pressão e cortes)", "Aperto das porcas e folga/lubrificação do eixo"] }
             ]
         };
 
@@ -401,7 +421,40 @@
                 "Bombas Dosadoras e Mangueiras (Girando livre, sem obstruções)": "Problema nas Bombas Dosadoras ou mangueiras obstruídas/ressecadas",
                 "Filtros de Discos e Registros (Limpos e operantes)": "Filtros de discos sujos ou registros inoperantes",
                 "Válvulas Solenoides (Testadas via celular/painel)": "Falha na abertura/fechamento das Válvulas Solenoides",
-                "Tubulações, Caixas e Casa de Adubos (Sem vazamentos)": "Vazamentos nas tubulações, caixas ou casa de adubos"
+                "Tubulações, Caixas e Casa de Adubos (Sem vazamentos)": "Vazamentos nas tubulações, caixas ou casa de adubos",
+
+                // Equipamentos de Trator - Roçadeira
+                "Pinos, travas de engate e correntes estabilizadoras": "Problema nos pinos, travas ou correntes estabilizadoras",
+                "Patins laterais (Regulagem de altura e desgaste)": "Patins desgastados ou desregulados",
+                "Saia de proteção (Borracha ou corrente contra pedras)": "Saia de proteção danificada ou faltando",
+                "Protetor do cardan, correntes de segurança e cruzetas (Lubrificação)": "Problema no cardan, falta de protetor ou lubrificação",
+                "Caixa multiplicadora (Nível de óleo, vazamentos e respiro desobstruído)": "Problema na caixa multiplicadora (óleo baixo/vazamento)",
+                "Facas/Lâminas (Desgaste, quebras, aperto dos parafusos e giro livre)": "Lâminas danificadas, frouxas ou presas",
+
+                // Equipamentos de Trator - Grade Arado
+                "Chassi central, seções e engates (Trincas e soldas)": "Trincas no chassi ou eixo das seções",
+                "Limpadores dos discos (Regulagem, tortos ou faltando)": "Limpadores desregulados, tortos ou ausentes",
+                "Mangueiras e cilindros hidráulicos (Vazamentos - se aplicável)": "Vazamento em mangueiras/cilindros hidráulicos",
+                "Discos (Desgaste, trincas ou quebras)": "Discos desgastados, trincados ou quebrados",
+                "Parafusos do eixo das seções (Aperto geral)": "Eixo das seções frouxo",
+                "Mancais de atrito/rolamento (Folga excessiva e lubrificação)": "Mancais com folga ou precisando de lubrificação",
+
+                // Equipamentos de Trator - Enxada Rotativa
+                "Pinos, travas de engate e tampa traseira niveladora": "Defeito nos engates ou tampa traseira danificada",
+                "Patins niveladores laterais (Regulagem e desgaste)": "Patins laterais desgastados ou desregulados",
+                "Rotor e flanges (Trincas ou empenamentos)": "Rotor ou flanges com trincas/empenados",
+                "Cardan com embreagem de fricção ou pino fusível (Protetor e cruzetas)": "Problema no cardan, cruzetas ou embreagem de segurança",
+                "Caixa de transmissão central (Nível de óleo e vazamentos)": "Problema na caixa central (óleo baixo/vazamento)",
+                "Transmissão lateral [corrente/engrenagem] (Tensão, óleo e vazamentos)": "Problema na transmissão lateral (óleo/tensão)",
+                "Lâminas/Enxadas (Desgaste, tortas, quebradas e aperto dos parafusos)": "Enxadas desgastadas, tortas, quebradas ou frouxas",
+
+                // Equipamentos de Trator - Carreta Agrícola
+                "Assoalho e tampas laterais (Tábuas quebradas ou soltas)": "Tábuas do assoalho ou tampas avariadas",
+                "Travas e dobradiças das tampas": "Travas ou dobradiças quebradas",
+                "Chassi principal (Trincas ou soldas quebradas)": "Trincas ou soldas quebradas no chassi",
+                "Cabeçalho, pino de engate e trava de segurança": "Defeito no cabeçalho, pino ou trava",
+                "Pneus e Câmaras (Pressão e cortes)": "Pneus murchos ou com cortes",
+                "Aperto das porcas e folga/lubrificação do eixo": "Porcas frouxas ou eixo desregulado/seco"
             };
             return friendlyNames[item] || item;
         }
@@ -446,74 +499,35 @@
 
         function getFullVehicleName() {
             const baseVehicle = document.getElementById('vehicleSelect').value;
-            if (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar' || baseVehicle === 'Sistema de Fertirrigação') {
-                const eqValue = document.getElementById('equipmentNumber').value;
+            const eqValue = document.getElementById('equipmentNumber').value;
+            if (baseVehicle === 'Equipamentos do Trator') {
+                return eqValue || baseVehicle;
+            } else if (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar' || baseVehicle === 'Sistema de Fertirrigação') {
                 return eqValue ? eqValue : baseVehicle;
             }
             return baseVehicle;
         }
 
-        // Quando altera o veículo, gera os campos do checklist
-        function handleVehicleChange() {
+        function handleEquipmentChange() {
             const vehicle = document.getElementById('vehicleSelect').value;
+            const equipment = document.getElementById('equipmentNumber').value;
+            
+            if (vehicle === 'Equipamentos do Trator') {
+                renderChecklist(equipment);
+            } else {
+                updatePreview();
+            }
+        }
+
+        function renderChecklist(checklistKey) {
             const container = document.getElementById('checklistContainer');
             const wrapper = document.getElementById('checklistItemsWrapper');
-            const driverLabel = document.getElementById('driverLabelText');
-            const equipmentNumberContainer = document.getElementById('equipmentNumberContainer');
-            const equipmentNumber = document.getElementById('equipmentNumber');
-            const equipmentLabel = document.getElementById('equipmentLabelText');
-            
-            // Lógica dinâmica para trocar "Motorista" por "Operador"
-            const isEquipment = vehicle === 'Roçadeira' || vehicle === 'Máquina de Pulverizar' || vehicle === 'Sistema de Fertirrigação';
-            
-            if (isEquipment) {
-                driverLabel.innerText = "Operador";
-                document.getElementById('driverSelect').options[0].text = "Selecione o operador...";
-                document.getElementById('previewVehicleLabel').innerText = "Equipamento";
-                
-                equipmentNumberContainer.classList.remove('hidden');
-                equipmentNumber.setAttribute('required', 'required');
-                
-                // Preenche as opções do select com base no equipamento escolhido
-                equipmentNumber.innerHTML = '<option value="">Selecione a identificação...</option>';
-                if (vehicle === 'Roçadeira') {
-                    equipmentLabel.innerText = "Identificação da Roçadeira";
-                    equipmentNumber.innerHTML += `
-                        <option value="Roçadeira - Toyama TBC63-1">Roçadeira - Toyama TBC63-1</option>
-                        <option value="Roçadeira - Toyama TBC63-2">Roçadeira - Toyama TBC63-2</option>
-                        <option value="Roçadeira - Toyama RT52LB-3">Roçadeira - Toyama RT52LB-3</option>
-                        <option value="Roçadeira - Toyama TBC43X-4">Roçadeira - Toyama TBC43X-4</option>
-                        <option value="Roçadeira - Vonder RGO330-1">Roçadeira - Vonder RGO330-1</option>
-                    `;
-                } else if (vehicle === 'Máquina de Pulverizar') {
-                    equipmentLabel.innerText = "Identificação da Máquina";
-                    equipmentNumber.innerHTML += `
-                        <option value="Máquina de Pulverizar - FOSPG-1">Máquina de Pulverizar - FOSPG-1</option>
-                        <option value="Máquina de Pulverizar - FOSPG-2">Máquina de Pulverizar - FOSPG-2</option>
-                    `;
-                } else if (vehicle === 'Sistema de Fertirrigação') {
-                    equipmentLabel.innerText = "Identificação do Sistema";
-                    equipmentNumber.innerHTML += `
-                        <option value="Sistema de Fertirrigação - Iponia">Sistema de Fertirrigação - Iponia</option>
-                    `;
-                }
-            } else {
-                driverLabel.innerText = "Motorista";
-                document.getElementById('driverSelect').options[0].text = "Selecione o motorista...";
-                document.getElementById('previewVehicleLabel').innerText = "Veículo";
-                
-                equipmentNumberContainer.classList.add('hidden');
-                equipmentNumber.removeAttribute('required');
-                equipmentNumber.innerHTML = '<option value="">Selecione...</option>';
-                equipmentNumber.value = ''; // Reseta a identificação escolhida
-            }
-            
             wrapper.innerHTML = '';
             
-            if (vehicle && checklistData[vehicle]) {
+            if (checklistKey && checklistData[checklistKey]) {
                 container.classList.remove('hidden');
                 
-                checklistData[vehicle].forEach((group, groupIdx) => {
+                checklistData[checklistKey].forEach((group, groupIdx) => {
                     let groupHtml = `
                         <div class="mb-4">
                             <h4 class="text-xs font-bold text-brand-600 uppercase mb-2 bg-brand-50 p-1 px-2 rounded">${group.category}</h4>
@@ -552,10 +566,79 @@
             updatePreview();
         }
 
+        // Quando altera o veículo, gera os campos do checklist
+        function handleVehicleChange() {
+            const vehicle = document.getElementById('vehicleSelect').value;
+            const driverLabel = document.getElementById('driverLabelText');
+            const equipmentNumberContainer = document.getElementById('equipmentNumberContainer');
+            const equipmentNumber = document.getElementById('equipmentNumber');
+            const equipmentLabel = document.getElementById('equipmentLabelText');
+            
+            // Lógica dinâmica para trocar "Motorista" por "Operador"
+            const isEquipment = vehicle === 'Roçadeira' || vehicle === 'Máquina de Pulverizar' || vehicle === 'Sistema de Fertirrigação' || vehicle === 'Equipamentos do Trator';
+            
+            if (isEquipment) {
+                driverLabel.innerText = "Operador";
+                document.getElementById('driverSelect').options[0].text = "Selecione o operador...";
+                document.getElementById('previewVehicleLabel').innerText = "Equipamento";
+                
+                equipmentNumberContainer.classList.remove('hidden');
+                equipmentNumber.setAttribute('required', 'required');
+                
+                // Preenche as opções do select com base no equipamento escolhido
+                equipmentNumber.innerHTML = '<option value="">Selecione a identificação...</option>';
+                if (vehicle === 'Roçadeira') {
+                    equipmentLabel.innerText = "Identificação da Roçadeira";
+                    equipmentNumber.innerHTML += `
+                        <option value="Roçadeira - Toyama TBC63-1">Roçadeira - Toyama TBC63-1</option>
+                        <option value="Roçadeira - Toyama TBC63-2">Roçadeira - Toyama TBC63-2</option>
+                        <option value="Roçadeira - Toyama RT52LB-3">Roçadeira - Toyama RT52LB-3</option>
+                        <option value="Roçadeira - Toyama TBC43X-4">Roçadeira - Toyama TBC43X-4</option>
+                        <option value="Roçadeira - Vonder RGO330-1">Roçadeira - Vonder RGO330-1</option>
+                    `;
+                } else if (vehicle === 'Máquina de Pulverizar') {
+                    equipmentLabel.innerText = "Identificação da Máquina";
+                    equipmentNumber.innerHTML += `
+                        <option value="Máquina de Pulverizar - FOSPG-1">Máquina de Pulverizar - FOSPG-1</option>
+                        <option value="Máquina de Pulverizar - FOSPG-2">Máquina de Pulverizar - FOSPG-2</option>
+                    `;
+                } else if (vehicle === 'Sistema de Fertirrigação') {
+                    equipmentLabel.innerText = "Identificação do Sistema";
+                    equipmentNumber.innerHTML += `
+                        <option value="Sistema de Fertirrigação - Iponia">Sistema de Fertirrigação - Iponia</option>
+                    `;
+                } else if (vehicle === 'Equipamentos do Trator') {
+                    equipmentLabel.innerText = "Selecione o Equipamento";
+                    equipmentNumber.innerHTML += `
+                        <option value="Roçadeira Trator">Roçadeira Trator</option>
+                        <option value="Grade Arado">Grade Arado</option>
+                        <option value="Enxada Rotativa">Enxada Rotativa</option>
+                        <option value="Carreta Agrícola">Carreta Agrícola</option>
+                    `;
+                }
+            } else {
+                driverLabel.innerText = "Motorista";
+                document.getElementById('driverSelect').options[0].text = "Selecione o motorista...";
+                document.getElementById('previewVehicleLabel').innerText = "Veículo";
+                
+                equipmentNumberContainer.classList.add('hidden');
+                equipmentNumber.removeAttribute('required');
+                equipmentNumber.innerHTML = '<option value="">Selecione...</option>';
+                equipmentNumber.value = ''; // Reseta a identificação escolhida
+            }
+            
+            if (vehicle === 'Equipamentos do Trator') {
+                renderChecklist(null); // Aguarda o usuário selecionar no sub-menu
+            } else {
+                renderChecklist(vehicle);
+            }
+        }
+
         // Atualiza a visualização do cartão da direita em tempo real
         function updatePreview() {
             const dateVal = document.getElementById('reportDate').value;
             const baseVehicle = document.getElementById('vehicleSelect').value;
+            const equipmentSelect = document.getElementById('equipmentNumber').value;
             const vehicle = getFullVehicleName();
             const driver = getDriverName() || 'Motorista não informado';
             const obs = document.getElementById('observations').value;
@@ -573,8 +656,13 @@
 
             const previewContent = document.getElementById('previewContent');
             const previewStatus = document.getElementById('previewStatus');
+            
+            let activeChecklistKey = baseVehicle;
+            if (baseVehicle === 'Equipamentos do Trator') {
+                activeChecklistKey = equipmentSelect;
+            }
 
-            if (!baseVehicle) {
+            if (!activeChecklistKey || !checklistData[activeChecklistKey]) {
                 previewContent.innerHTML = `<div class="text-center text-slate-400 text-xs italic py-10 my-auto">O checklist aparecerá aqui assim que você selecionar um veículo e iniciar o preenchimento.</div>`;
                 previewStatus.className = "px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider bg-slate-100 text-slate-400";
                 previewStatus.innerText = "Pendente";
@@ -588,7 +676,7 @@
             // Layout dinâmico que se ajusta ao conteúdo, sem esticar os itens
             let checklistResultsHtml = `<div class="flex flex-col gap-4 w-full">`;
             
-            checklistData[baseVehicle].forEach((group, groupIdx) => {
+            checklistData[activeChecklistKey].forEach((group, groupIdx) => {
                 checklistResultsHtml += `<div class="bg-slate-50 rounded-xl p-4 border border-slate-200 shadow-sm"><h4 class="text-[11px] font-black text-slate-400 uppercase mb-3">${group.category}</h4><ul class="space-y-2.5">`;
                 
                 group.items.forEach((item, itemIdx) => {
@@ -740,9 +828,14 @@
             
             // Validar se todos os radios foram marcados
             const vehicle = document.getElementById('vehicleSelect').value;
+            let activeChecklistKey = vehicle;
+            if (vehicle === 'Equipamentos do Trator') {
+                activeChecklistKey = document.getElementById('equipmentNumber').value;
+            }
+
             let allChecked = true;
-            if(vehicle && checklistData[vehicle]){
-                checklistData[vehicle].forEach((group, groupIdx) => {
+            if(activeChecklistKey && checklistData[activeChecklistKey]){
+                checklistData[activeChecklistKey].forEach((group, groupIdx) => {
                     group.items.forEach((item, itemIdx) => {
                         const inputName = `chk_${groupIdx}_${itemIdx}`;
                         if(!document.querySelector(`input[name="${inputName}"]:checked`)) {
@@ -843,7 +936,12 @@
                 let allItemsList = []; // Alterado para armazenar TODOS os itens verificados
                 let hasIssues = false;
                 
-                checklistData[baseVehicle].forEach((group, groupIdx) => {
+                let activeChecklistKey = baseVehicle;
+                if (baseVehicle === 'Equipamentos do Trator') {
+                    activeChecklistKey = document.getElementById('equipmentNumber').value;
+                }
+                
+                checklistData[activeChecklistKey].forEach((group, groupIdx) => {
                     let groupNokText = "";
                     let groupHasNok = false;
                     
