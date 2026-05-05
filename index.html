@@ -468,7 +468,9 @@
             const dateInput = document.getElementById('reportDate');
             if (!dateInput.value) {
                 const today = new Date();
-                dateInput.value = today.toISOString().split('T')[0];
+                // Ajuste de fuso horário para pegar a data local corretamente (evita adiantar 1 dia à noite)
+                const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                dateInput.value = localDate;
             }
             updatePreview();
         });
