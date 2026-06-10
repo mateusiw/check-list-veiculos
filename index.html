@@ -6,9 +6,9 @@
     <title>Checklist de Veículos SPG</title>
     
     <!-- Ícones Modernos -->
-    <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/512/checked-checkbox.png">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/512/checked-checkbox.png">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Checklist SPG","short_name":"Checklist","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#759587","icons":[{"src":"https://img.icons8.com/fluency/192/checked-checkbox.png","sizes":"192x192","type":"image/png"},{"src":"https://img.icons8.com/fluency/512/checked-checkbox.png","sizes":"512x512","type":"image/png"}]}'>
+    <link id="siteFavicon" rel="icon" type="image/png" href="https://i.imgur.com/NWM3Pth.png">
+    <link id="siteAppleTouchIcon" rel="apple-touch-icon" href="https://i.imgur.com/NWM3Pth.png">
+    <link id="siteManifest" rel="manifest" href='data:application/manifest+json,{"name":"Checklist SPG","short_name":"Checklist","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#759587","icons":[{"src":"https://i.imgur.com/NWM3Pth.png","sizes":"192x192","type":"image/png"},{"src":"https://i.imgur.com/NWM3Pth.png","sizes":"512x512","type":"image/png"}]}'>
     
     <meta name="theme-color" content="#759587">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -43,67 +43,137 @@
     <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
     
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; background: #eef2f7; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         input, select, textarea { line-height: 1.5; }
         .animate-fade-in-down { animation: fadeInDown 0.3s ease-out forwards; }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Estilo customizado para os radio buttons ficarem como botões marcáveis */
-        .check-radio:checked + div {
-            border-color: currentColor;
-            background-color: currentColor;
+
+        @keyframes pulse-ring { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.25); } }
+        .pulse-dot { animation: pulse-ring 2.5s ease-in-out infinite; }
+
+        .check-radio:checked + div { border-color: currentColor; background-color: currentColor; }
+        .check-radio:checked + div span { color: white; }
+
+        /* Nav */
+        .nav-bar { background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%); border-bottom: 1px solid rgba(255,255,255,0.06); }
+
+        /* Form card */
+        .form-card { background: #fff; border-radius: 20px; border: 1.5px solid #e8edf3; box-shadow: 0 2px 8px rgba(0,0,0,0.05), 0 0 0 1px rgba(255,255,255,0.8); }
+        .form-card-header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 18px 18px 0 0; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+
+        /* Section label */
+        .section-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+
+        /* Fields */
+        select, input[type="date"], input[type="text"], textarea {
+            border: 1.5px solid #dde3ec !important;
+            border-radius: 10px !important;
+            background: #f8fafc !important;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            font-size: 13px !important;
         }
-        .check-radio:checked + div span {
-            color: white;
+        select:focus, input[type="date"]:focus, input[type="text"]:focus, textarea:focus {
+            border-color: #759587 !important;
+            box-shadow: 0 0 0 3px rgba(117,149,135,0.15) !important;
+            background: #fff !important;
+            outline: none !important;
         }
+
+        /* Category block */
+        .cat-block { border-radius: 14px; overflow: hidden; border: 1.5px solid #e2e8f0; margin-bottom: 10px; }
+        .cat-block:last-child { margin-bottom: 0; }
+        .cat-header { padding: 9px 14px; display: flex; align-items: center; gap: 8px; }
+        .cat-header-kia    { background: linear-gradient(to right, #1e3a5f, #1e40af); }
+        .cat-header-mec    { background: linear-gradient(to right, #7c2d12, #9a3412); }
+        .cat-header-cab    { background: linear-gradient(to right, #14532d, #166534); }
+        .cat-header-seg    { background: linear-gradient(to right, #1e3a5f, #1e40af); }
+        .cat-header-op     { background: linear-gradient(to right, #4a1d96, #6d28d9); }
+        .cat-header-default{ background: linear-gradient(to right, #1e293b, #334155); }
+
+        /* Check item row */
+        .chk-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; border-bottom: 1px solid #f1f5f9; background: #fff; transition: background 0.12s; }
+        .chk-row:last-child { border-bottom: none; }
+        .chk-row:hover { background: #f8fafc; }
+
+        /* OK / NOK toggle */
+        .chk-btn { display: flex; align-items: center; justify-content: center; gap: 4px; width: 54px; height: 34px; border-radius: 8px; border: 2px solid #e2e8f0; background: #f8fafc; font-size: 11px; font-weight: 900; color: #94a3b8; transition: all 0.15s ease; user-select: none; cursor: pointer; }
+        .chk-btn:hover { transform: scale(1.04); }
+        .chk-btn-ok:hover { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+        .chk-btn-nok:hover { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
+        .check-radio.ok-radio:checked + .chk-btn-ok { background: #16a34a; border-color: #16a34a; color: #fff; box-shadow: 0 2px 8px rgba(22,163,74,0.35); }
+        .check-radio.nok-radio:checked + .chk-btn-nok { background: #dc2626; border-color: #dc2626; color: #fff; box-shadow: 0 2px 8px rgba(220,38,38,0.35); }
+
+        /* Progress bar */
+        .progress-track { background: #e2e8f0; border-radius: 99px; height: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(to right, #759587, #5e7b6d); transition: width 0.4s ease; }
+
+        /* Stats pill */
+        .stat-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+
+        /* Preview enhancements */
+        .preview-wrapper { background: linear-gradient(135deg, #dde4ed 0%, #c8d5e0 100%); padding: 16px; border-radius: 24px; border: 1.5px solid #c2ccd8; }
+        #report-card { border-radius: 16px !important; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08) !important; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen pb-20 select-none">
+<body class="text-slate-800 min-h-screen pb-20 select-none">
 
     <!-- Navbar -->
-    <div class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center shadow-sm sticky top-0 z-40">
+    <div class="nav-bar px-4 py-2.5 flex justify-between items-center sticky top-0 z-40">
         <div class="flex items-center gap-3">
-            <img src="https://img.icons8.com/fluency/512/checked-checkbox.png" alt="Logo SPG" class="w-8 h-8 rounded-lg shadow-sm border border-slate-100">
+            <div class="relative shrink-0">
+                <img src="https://i.imgur.com/NWM3Pth.png" alt="Logo SPG" class="w-10 h-10 rounded-xl object-cover border-2 border-brand-500/40 shadow-lg">
+                <span class="pulse-dot absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-slate-900"></span>
+            </div>
             <div>
-                <h1 class="text-sm font-bold text-slate-800 leading-tight">SPG SEDE</h1>
-                <p class="text-[10px] text-brand-600 font-bold uppercase tracking-wide">Checklist de Veículos</p>
+                <h1 class="text-sm font-black text-white leading-tight tracking-wide">SPG SEDE</h1>
+                <p class="text-[10px] text-brand-400 font-bold uppercase tracking-widest">Frota & Equipamentos</p>
             </div>
         </div>
         <div class="flex gap-2">
-            <button type="button" onclick="confirmBeforeSend()" class="flex items-center gap-2 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20 transition-all active:scale-95 active:bg-brand-700">
-                <i data-lucide="share-2" class="w-4 h-4"></i>
-                <span class="hidden sm:inline">Enviar para o WhatsApp</span>
+            <button id="installAppBtn" type="button" onclick="installApp()" class="hidden items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/15 rounded-xl text-xs font-bold transition-all active:scale-95">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Instalar</span>
+            </button>
+            <button type="button" onclick="confirmBeforeSend()" class="flex items-center gap-2 px-4 py-2 bg-brand-500 hover:bg-brand-400 text-white rounded-xl text-xs font-black shadow-lg shadow-brand-900/50 transition-all active:scale-95 border border-brand-400/40">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                <span class="hidden sm:inline">Enviar para WhatsApp</span>
                 <span class="sm:hidden">Enviar</span>
             </button>
         </div>
     </div>
 
-    <div class="container mx-auto p-4 flex flex-col lg:flex-row gap-8 mt-4">
-        
+    <div class="container mx-auto p-4 flex flex-col lg:flex-row gap-6 mt-4">
+
         <!-- COLUNA DA ESQUERDA: FORMULÁRIO -->
         <div class="w-full lg:w-1/2 space-y-4">
 
             <!-- 1. DADOS INICIAIS -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
-                    <i data-lucide="clipboard-check" class="text-brand-500"></i> Iniciar Checklist
-                </h2>
-                
-                <form id="checklistForm" class="space-y-4">
+            <div class="form-card overflow-hidden">
+                <div class="form-card-header">
+                    <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-brand-500/20 border border-brand-400/30 shrink-0">
+                        <i data-lucide="clipboard-check" class="w-5 h-5 text-brand-400"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-black text-white leading-tight">Iniciar Checklist</h2>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Preencha os dados da inspeção</p>
+                    </div>
+                </div>
+
+                <form id="checklistForm" class="space-y-4 p-5">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Data da Inspeção</label>
-                            <input type="date" id="reportDate" required onchange="updatePreview()" class="w-full p-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-500 outline-none font-bold">
+                            <label class="section-label"><i data-lucide="calendar" class="w-3 h-3"></i> Data da Inspeção</label>
+                            <input type="date" id="reportDate" required onchange="updatePreview()" class="w-full p-2.5 border font-bold">
                         </div>
                         <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Veículo / Equipamento</label>
-                            <select id="vehicleSelect" required onchange="handleVehicleChange()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
+                            <label class="section-label"><i data-lucide="truck" class="w-3 h-3"></i> Veículo / Equipamento</label>
+                            <select id="vehicleSelect" required onchange="handleVehicleChange()" class="w-full p-2.5 border font-bold">
                                 <option value="">Selecione...</option>
                                 <option value="Kia Bongo">Kia Bongo (Caminhão)</option>
                                 <option value="Trator">Trator</option>
-                                <option value="Equipamentos do Trator">Equipamentos do Trator</option>
+                                <option value="Implementos do Trator">Implementos do Trator</option>
                                 <option value="Roçadeira">Roçadeira</option>
                                 <option value="Máquina de Pulverizar">Máquina de Pulverizar</option>
                                 <option value="Sistema de Fertirrigação">Sistema de Fertirrigação</option>
@@ -112,19 +182,19 @@
                     </div>
 
                     <div id="equipmentNumberContainer" class="hidden animate-fade-in-down">
-                        <label id="equipmentLabelText" class="text-xs font-bold text-slate-500 uppercase mb-1 block">Identificação do Equipamento</label>
-                        <select id="equipmentNumber" onchange="handleEquipmentChange()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
+                        <label id="equipmentLabelText" class="section-label"><i data-lucide="tag" class="w-3 h-3"></i> Identificação do Equipamento</label>
+                        <select id="equipmentNumber" onchange="handleEquipmentChange()" class="w-full p-2.5 border font-bold">
                             <option value="">Selecione a identificação...</option>
                         </select>
                     </div>
 
                     <div>
-                        <label id="driverLabelText" class="text-xs font-bold text-slate-500 uppercase mb-1 block">Motorista</label>
-                        <select id="driverSelect" required onchange="handleDriverChange()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-bold">
+                        <label id="driverLabelText" class="section-label"><i data-lucide="user" class="w-3 h-3"></i> Motorista</label>
+                        <select id="driverSelect" required onchange="handleDriverChange()" class="w-full p-2.5 border font-bold">
                             <option value="">Selecione o motorista...</option>
                             <option value="Mateus Paulo">Mateus Paulo</option>
                             <option value="Silvio Brito">Silvio Brito</option>
-                            <option value="Henrique Barros">Henrique Barros</option>
+                            <option value="Henrique Soares">Henrique Soares</option>
                             <option value="Eduardo Souza">Eduardo Souza</option>
                             <option value="Manoel Messias">Manoel Messias</option>
                             <option value="Erisvaldo Camelo">Erisvaldo Camelo</option>
@@ -146,29 +216,39 @@
                     </div>
 
                     <!-- CONTAINER DO CHECKLIST DINÂMICO -->
-                    <div id="checklistContainer" class="hidden mt-6 animate-fade-in-down">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <h3 class="text-sm font-black text-slate-700 uppercase mb-3 text-center border-b border-slate-200 pb-2">Itens de Inspeção</h3>
-                            <p class="text-xs text-slate-500 mb-4 text-center">Marque <b class="text-green-600">OK</b> se estiver tudo certo ou <b class="text-red-500">NOK</b> se houver problema.</p>
-                            
-                            <div id="checklistItemsWrapper" class="space-y-4">
-                                <!-- Os itens serão gerados via JavaScript aqui -->
+                    <div id="checklistContainer" class="hidden mt-2 animate-fade-in-down">
+                        <div class="rounded-2xl border-2 border-dashed border-brand-200 bg-brand-50/40 p-3 mb-2">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="list-checks" class="w-4 h-4 text-brand-600"></i>
+                                    <span class="text-xs font-black text-slate-700 uppercase tracking-wide">Itens de Inspeção</span>
+                                </div>
+                                <div id="checklistProgress" class="flex items-center gap-2">
+                                    <span id="progressLabel" class="text-[11px] font-bold text-slate-500">0 / 0</span>
+                                </div>
                             </div>
+                            <div class="progress-track mb-3">
+                                <div id="progressFill" class="progress-fill" style="width:0%"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500 text-center">Marque <b class="text-green-600">OK</b> se OK ou <b class="text-red-500">NOK</b> se houver defeito</p>
+                        </div>
+                        <div id="checklistItemsWrapper" class="space-y-2">
+                            <!-- Os itens serão gerados via JavaScript aqui -->
                         </div>
                     </div>
 
-                    <div class="pt-4">
-                        <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Observações / Defeitos</label>
-                        <textarea id="observations" rows="3" placeholder="Descreva lâmpadas queimadas, avisos no painel, pneus furados, avarias na lataria, etc..." oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none resize-none"></textarea>
+                    <div class="pt-2">
+                        <label class="section-label"><i data-lucide="message-square" class="w-3 h-3"></i> Observações / Defeitos</label>
+                        <textarea id="observations" rows="3" placeholder="Descreva lâmpadas queimadas, avisos no painel, pneus furados, avarias na lataria, etc..." oninput="updatePreview()" class="w-full p-2.5 border resize-none text-sm"></textarea>
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1 justify-between">
+                        <label class="section-label flex justify-between">
                             <span class="flex items-center gap-1"><i data-lucide="camera" class="w-3 h-3"></i> Fotos em Anexo (Máx. 4)</span>
-                            <span id="photoCounter" class="text-[10px] text-brand-600 font-bold bg-brand-50 px-2 py-0.5 rounded-full">0/4</span>
+                            <span id="photoCounter" class="text-[10px] text-brand-600 font-black bg-brand-100 px-2 py-0.5 rounded-full">0/4</span>
                         </label>
-                        <input type="file" id="photoUpload" accept="image/*" multiple capture="environment" onchange="handleImageUpload(event)" class="w-full p-2 border border-slate-300 rounded-lg text-sm bg-slate-50 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 transition-colors">
-                        
+                        <input type="file" id="photoUpload" accept="image/*" multiple capture="environment" onchange="handleImageUpload(event)" class="w-full p-2 border border-slate-300 rounded-xl text-sm bg-slate-50 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 transition-colors">
+
                         <div id="photoPreviewContainer" class="hidden mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 animate-fade-in-down">
                         </div>
                     </div>
@@ -177,44 +257,56 @@
         </div>
 
         <!-- COLUNA DA DIREITA: PREVIEW DO RELATÓRIO -->
-        <div class="w-full lg:w-1/2 flex flex-col bg-slate-200/50 p-4 rounded-3xl border border-slate-300/50 h-max">
-            <div id="report-card" class="w-full h-auto flex flex-col bg-white rounded-none shadow-2xl overflow-hidden border border-slate-100 relative">
-                
+        <div class="w-full lg:w-1/2 flex flex-col preview-wrapper h-max">
+            <div id="report-card" class="w-full h-auto flex flex-col bg-white relative">
+
                 <!-- HEADER DO PREVIEW -->
-                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 text-white relative overflow-hidden flex flex-col justify-start shrink-0 border-b border-slate-800">
-                    <!-- Efeito de luz (glow) no fundo -->
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-                    
-                    <i data-lucide="clipboard-check" class="absolute -right-4 top-1/2 -translate-y-1/2 w-32 h-32 z-0 opacity-5 text-white transform -rotate-12"></i>
-                    
-                    <div class="relative z-10 w-full"> 
-                        <h2 class="text-3xl font-black leading-tight tracking-tight text-white">Checklist Diário</h2>
-                        
-                        <div class="flex flex-wrap items-center gap-3 mt-6">
-                             <!-- Badge de Data -->
-                             <div class="flex items-center gap-2 bg-slate-800/80 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-700/50 shadow-sm">
-                                 <i data-lucide="calendar" class="w-4 h-4 text-brand-400"></i>
-                                 <span id="previewDateTime" class="text-xs font-bold text-slate-200 tracking-wide">--/--/----</span>
-                             </div>
-                             <!-- Badge de Motorista -->
-                             <div class="flex items-center gap-2 bg-slate-800/80 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-700/50 shadow-sm">
-                                 <i data-lucide="user" class="w-4 h-4 text-brand-400"></i>
-                                 <span id="previewDriver" class="text-xs font-bold text-slate-200 tracking-wide uppercase">Preencha os dados...</span>
-                             </div>
+                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 text-white relative overflow-hidden flex flex-col justify-start shrink-0">
+                    <div class="absolute top-0 right-0 w-72 h-72 bg-brand-500/15 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none"></div>
+                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
+                    <i data-lucide="clipboard-check" class="absolute -right-2 top-1/2 -translate-y-1/2 w-28 h-28 opacity-[0.04] text-white -rotate-12 pointer-events-none"></i>
+
+                    <div class="relative z-10 w-full">
+                        <div class="flex items-center gap-3 mb-4">
+                            <img src="https://i.imgur.com/NWM3Pth.png" class="w-9 h-9 rounded-xl border-2 border-brand-400/40 object-cover shadow-lg">
+                            <div>
+                                <h2 class="text-xl font-black text-white leading-tight">Checklist Diário</h2>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2">
+                            <div class="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/10">
+                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-400"></i>
+                                <span id="previewDateTime" class="text-xs font-bold text-slate-200 tracking-wide">--/--/----</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/10">
+                                <i data-lucide="user" class="w-3.5 h-3.5 text-brand-400"></i>
+                                <span id="previewDriver" class="text-xs font-bold text-slate-200 tracking-wide uppercase">Preencha os dados...</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- DADOS E STATUS -->
-                <div class="bg-white px-6 pt-5 shrink-0">
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <span id="previewVehicleLabel" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Veículo</span>
-                            <span id="previewVehicle" class="text-sm font-black text-slate-800 uppercase whitespace-nowrap">---</span>
+                <div class="bg-white px-5 pt-4 pb-1 shrink-0 border-b border-slate-100">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div id="previewVehicleIconContainer" class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                                <i data-lucide="truck" class="w-5 h-5 text-slate-500"></i>
+                            </div>
+                            <div>
+                                <span id="previewVehicleLabel" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Veículo</span>
+                                <span id="previewVehicle" class="text-sm font-black text-slate-800 uppercase">---</span>
+                            </div>
                         </div>
-                        <div id="previewStatus" class="px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-400">
+                        <div id="previewStatus" class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-400">
                             Pendente
                         </div>
+                    </div>
+                    <div id="previewStatsRow" class="hidden flex items-center gap-2 mt-3 pb-3">
+                        <span id="statOk" class="stat-pill bg-green-50 text-green-700"><i data-lucide="check" class="w-3 h-3"></i> 0 OK</span>
+                        <span id="statNok" class="stat-pill bg-red-50 text-red-600"><i data-lucide="x" class="w-3 h-3"></i> 0 NOK</span>
+                        <span id="statPending" class="stat-pill bg-slate-100 text-slate-500"><i data-lucide="minus" class="w-3 h-3"></i> 0 pendentes</span>
                     </div>
                 </div>
 
@@ -225,10 +317,9 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-100 p-3 text-center border-t border-slate-200 shrink-0">
-                    <div class="flex justify-center items-center gap-2 text-[10px] text-slate-400 font-medium uppercase tracking-widest leading-relaxed">
-                        SPG SEDE • Frota e Equipamentos
-                    </div>
+                <div class="shrink-0" style="background:linear-gradient(to right,#1e293b,#334155);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
+                    <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">SPG SEDE</span>
+                    <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;">Frota & Equipamentos</span>
                 </div>
             </div>
         </div>
@@ -502,7 +593,7 @@
         function getFullVehicleName() {
             const baseVehicle = document.getElementById('vehicleSelect').value;
             const eqValue = document.getElementById('equipmentNumber').value;
-            if (baseVehicle === 'Equipamentos do Trator') {
+            if (baseVehicle === 'Implementos do Trator') {
                 return eqValue || baseVehicle;
             } else if (baseVehicle === 'Roçadeira' || baseVehicle === 'Máquina de Pulverizar' || baseVehicle === 'Sistema de Fertirrigação') {
                 return eqValue ? eqValue : baseVehicle;
@@ -514,53 +605,202 @@
             const vehicle = document.getElementById('vehicleSelect').value;
             const equipment = document.getElementById('equipmentNumber').value;
             
-            if (vehicle === 'Equipamentos do Trator') {
+            if (vehicle === 'Implementos do Trator') {
                 renderChecklist(equipment);
             } else {
                 updatePreview();
             }
         }
 
+        // SVGs personalizados para cada tipo de veículo/equipamento
+        function getVehicleIconHtml(baseVehicle, fullVehicle) {
+            const s = 'width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+
+            // Kia Bongo → caminhão
+            if (baseVehicle === 'Kia Bongo') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`;
+            }
+
+            // Trator
+            if (baseVehicle === 'Trator') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}><path d="M3 17h3m11 0h2m-8-9V5h5l3 5"/><circle cx="6" cy="17" r="3"/><circle cx="17" cy="17" r="3"/><path d="M9 8H3v9"/><rect x="9" y="8" width="7" height="7" rx="1"/></svg>`;
+            }
+
+            // Roçadeira → roçadeira manual (motor + haste + cabeçote)
+            if (baseVehicle === 'Roçadeira' || fullVehicle.startsWith('Roçadeira')) {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}>
+                    <rect x="2" y="2" width="5" height="4" rx="1"/>
+                    <line x1="4.5" y1="6" x2="16" y2="17.5"/>
+                    <circle cx="19" cy="19" r="3"/>
+                    <line x1="16.8" y1="19" x2="21.2" y2="19"/>
+                    <line x1="19" y1="16.8" x2="19" y2="21.2"/>
+                </svg>`;
+            }
+
+            // Máquina de Pulverizar → borrifador
+            if (baseVehicle === 'Máquina de Pulverizar' || fullVehicle.startsWith('Máquina de Pulverizar')) {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}><path d="M3 3h6v6H3z"/><path d="M9 6h3"/><path d="M12 4v4"/><path d="M14 6c2 0 4 1 4 4v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-4"/><line x1="16" y1="10" x2="19" y2="7"/><line x1="19" y1="7" x2="21" y2="9"/><line x1="18" y1="4" x2="20" y2="6"/></svg>`;
+            }
+
+            // Sistema de Fertirrigação → tubulação com gotejadores
+            if (baseVehicle === 'Sistema de Fertirrigação' || fullVehicle.startsWith('Sistema de Fertirrigação')) {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}>
+                    <line x1="2" y1="7" x2="22" y2="7"/>
+                    <line x1="6" y1="7" x2="6" y2="11"/>
+                    <path d="M4 14 a2 2 0 0 0 4 0 l-2-3z"/>
+                    <line x1="12" y1="7" x2="12" y2="11"/>
+                    <path d="M10 14 a2 2 0 0 0 4 0 l-2-3z"/>
+                    <line x1="18" y1="7" x2="18" y2="11"/>
+                    <path d="M16 14 a2 2 0 0 0 4 0 l-2-3z"/>
+                    <rect x="9" y="2" width="6" height="4" rx="1"/>
+                </svg>`;
+            }
+
+            // Implementos individuais
+            if (fullVehicle === 'Carreta Agrícola') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}>
+                    <rect x="3" y="5" width="18" height="10" rx="1"/>
+                    <line x1="3" y1="10" x2="1" y2="10"/>
+                    <line x1="1" y1="10" x2="1" y2="16"/>
+                    <circle cx="8" cy="18" r="2.5"/>
+                    <circle cx="18" cy="18" r="2.5"/>
+                    <line x1="1" y1="16" x2="3" y2="15"/>
+                </svg>`;
+            }
+
+            if (fullVehicle === 'Grade Arado') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}>
+                    <line x1="2" y1="7" x2="22" y2="7"/>
+                    <line x1="5" y1="7" x2="5" y2="9"/>
+                    <ellipse cx="5" cy="14" rx="2.5" ry="5"/>
+                    <line x1="11" y1="7" x2="11" y2="9"/>
+                    <ellipse cx="11" cy="14" rx="2.5" ry="5"/>
+                    <line x1="17" y1="7" x2="17" y2="9"/>
+                    <ellipse cx="17" cy="14" rx="2.5" ry="5"/>
+                    <line x1="4" y1="2" x2="12" y2="7"/>
+                    <line x1="12" y1="2" x2="12" y2="7"/>
+                    <line x1="20" y1="2" x2="12" y2="7"/>
+                </svg>`;
+            }
+
+            if (fullVehicle === 'Enxada Rotativa') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}>
+                    <rect x="3" y="7" width="18" height="5" rx="1"/>
+                    <line x1="12" y1="3" x2="12" y2="7"/>
+                    <line x1="8" y1="4" x2="12" y2="7"/>
+                    <line x1="16" y1="4" x2="12" y2="7"/>
+                    <line x1="6" y1="12" x2="5" y2="18"/>
+                    <line x1="5" y1="18" x2="8" y2="18"/>
+                    <line x1="10" y1="12" x2="9" y2="18"/>
+                    <line x1="9" y1="18" x2="12" y2="18"/>
+                    <line x1="14" y1="12" x2="13" y2="18"/>
+                    <line x1="13" y1="18" x2="16" y2="18"/>
+                    <line x1="18" y1="12" x2="17" y2="18"/>
+                    <line x1="17" y1="18" x2="20" y2="18"/>
+                </svg>`;
+            }
+
+            if (fullVehicle === 'Roçadeira Trator') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}>
+                    <line x1="8" y1="3" x2="12" y2="9"/>
+                    <line x1="16" y1="3" x2="12" y2="9"/>
+                    <line x1="12" y1="3" x2="12" y2="9"/>
+                    <rect x="2" y="9" width="20" height="4" rx="1"/>
+                    <circle cx="12" cy="18" r="4"/>
+                    <line x1="9" y1="18" x2="15" y2="18"/>
+                    <line x1="12" y1="15" x2="12" y2="21"/>
+                </svg>`;
+            }
+
+            // Implementos do Trator genérico → engate 3 pontos
+            if (baseVehicle === 'Implementos do Trator') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" ${s}>
+                    <circle cx="12" cy="5" r="2"/>
+                    <line x1="12" y1="7" x2="12" y2="13"/>
+                    <line x1="12" y1="13" x2="5" y2="20"/>
+                    <line x1="12" y1="13" x2="19" y2="20"/>
+                    <circle cx="5" cy="21" r="1.5"/>
+                    <circle cx="19" cy="21" r="1.5"/>
+                    <line x1="4" y1="13" x2="20" y2="13"/>
+                </svg>`;
+            }
+
+            // Padrão
+            return `<svg xmlns="http://www.w3.org/2000/svg" ${s}><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`;
+        }
+
+        const categoryColors = [
+            'cat-header-kia', 'cat-header-mec', 'cat-header-cab',
+            'cat-header-seg', 'cat-header-op', 'cat-header-default'
+        ];
+
         function renderChecklist(checklistKey) {
             const container = document.getElementById('checklistContainer');
             const wrapper = document.getElementById('checklistItemsWrapper');
             wrapper.innerHTML = '';
-            
+
             if (checklistKey && checklistData[checklistKey]) {
                 container.classList.remove('hidden');
-                
+
                 checklistData[checklistKey].forEach((group, groupIdx) => {
+                    const colorClass = categoryColors[groupIdx % categoryColors.length];
+                    const totalItems = group.items.length;
                     let groupHtml = `
-                        <div class="mb-4">
-                            <h4 class="text-xs font-bold text-brand-600 uppercase mb-2 bg-brand-50 p-1 px-2 rounded">${group.category}</h4>
-                            <div class="space-y-2">
+                        <div class="cat-block">
+                            <div class="cat-header ${colorClass}">
+                                <span class="text-white font-black text-[11px] uppercase tracking-widest flex-1">${group.category}</span>
+                                <span class="text-white/60 text-[10px] font-bold">${totalItems} iten${totalItems !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div>
                     `;
-                    
+
                     group.items.forEach((item, itemIdx) => {
                         const inputName = `chk_${groupIdx}_${itemIdx}`;
                         groupHtml += `
-                            <div class="flex justify-between items-center py-2 border-b border-slate-200/50 last:border-0">
-                                <span class="text-sm text-slate-700 font-medium pr-2">${item}</span>
+                            <div class="chk-row">
+                                <span class="text-[13px] text-slate-700 font-semibold pr-3 leading-snug">${item}</span>
                                 <div class="flex gap-2 shrink-0">
-                                    <label class="relative cursor-pointer group">
-                                        <input type="radio" name="${inputName}" value="OK" class="peer sr-only check-radio" onchange="updatePreview()" required>
-                                        <div class="w-12 py-1.5 rounded text-center border-2 border-slate-200 text-slate-400 group-hover:bg-slate-50 transition-all peer-checked:bg-green-500 peer-checked:border-green-500 peer-checked:text-white">
-                                            <span class="text-xs font-black">OK</span>
+                                    <label class="cursor-pointer" title="OK">
+                                        <input type="radio" name="${inputName}" value="OK" class="sr-only check-radio ok-radio" onchange="updatePreview()" required>
+                                        <div class="chk-btn chk-btn-ok">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            OK
                                         </div>
                                     </label>
-                                    <label class="relative cursor-pointer group">
-                                        <input type="radio" name="${inputName}" value="NOK" class="peer sr-only check-radio" onchange="updatePreview()">
-                                        <div class="w-12 py-1.5 rounded text-center border-2 border-slate-200 text-slate-400 group-hover:bg-slate-50 transition-all peer-checked:bg-red-500 peer-checked:border-red-500 peer-checked:text-white">
-                                            <span class="text-xs font-black">NOK</span>
+                                    <label class="cursor-pointer" title="NOK">
+                                        <input type="radio" name="${inputName}" value="NOK" class="sr-only check-radio nok-radio" onchange="updatePreview()">
+                                        <div class="chk-btn chk-btn-nok">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                            NOK
                                         </div>
                                     </label>
                                 </div>
                             </div>
                         `;
                     });
-                    
+
                     groupHtml += `</div></div>`;
                     wrapper.innerHTML += groupHtml;
+                });
+
+                // Apply checked styles via JS since CSS peer doesn't work across DOM
+                wrapper.addEventListener('change', () => {
+                    wrapper.querySelectorAll('.check-radio').forEach(radio => {
+                        const btn = radio.nextElementSibling;
+                        if (!btn) return;
+                        if (radio.checked) {
+                            if (radio.value === 'OK') {
+                                btn.style.background = '#16a34a'; btn.style.borderColor = '#16a34a'; btn.style.color = '#fff';
+                                btn.style.boxShadow = '0 2px 8px rgba(22,163,74,0.35)';
+                            } else {
+                                btn.style.background = '#dc2626'; btn.style.borderColor = '#dc2626'; btn.style.color = '#fff';
+                                btn.style.boxShadow = '0 2px 8px rgba(220,38,38,0.35)';
+                            }
+                        } else {
+                            btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = '';
+                            btn.style.boxShadow = '';
+                        }
+                    });
                 });
             } else {
                 container.classList.add('hidden');
@@ -577,10 +817,10 @@
             const equipmentLabel = document.getElementById('equipmentLabelText');
             
             // Lógica dinâmica para trocar "Motorista" por "Operador"
-            const isEquipment = vehicle === 'Roçadeira' || vehicle === 'Máquina de Pulverizar' || vehicle === 'Sistema de Fertirrigação' || vehicle === 'Equipamentos do Trator';
+            const isEquipment = vehicle === 'Roçadeira' || vehicle === 'Máquina de Pulverizar' || vehicle === 'Sistema de Fertirrigação' || vehicle === 'Implementos do Trator';
             
             if (isEquipment) {
-                driverLabel.innerText = "Operador";
+                driverLabel.innerHTML = '<i data-lucide="user" class="w-3 h-3"></i> Operador';
                 document.getElementById('driverSelect').options[0].text = "Selecione o operador...";
                 document.getElementById('previewVehicleLabel').innerText = "Equipamento";
                 
@@ -590,7 +830,7 @@
                 // Preenche as opções do select com base no equipamento escolhido
                 equipmentNumber.innerHTML = '<option value="">Selecione a identificação...</option>';
                 if (vehicle === 'Roçadeira') {
-                    equipmentLabel.innerText = "Identificação da Roçadeira";
+                    equipmentLabel.innerHTML = '<i data-lucide="tag" class="w-3 h-3"></i> Identificação da Roçadeira';
                     equipmentNumber.innerHTML += `
                         <option value="Roçadeira - Toyama TBC63-1">Roçadeira - Toyama TBC63-1</option>
                         <option value="Roçadeira - Toyama TBC63-2">Roçadeira - Toyama TBC63-2</option>
@@ -599,18 +839,18 @@
                         <option value="Roçadeira - Vonder RGO330-1">Roçadeira - Vonder RGO330-1</option>
                     `;
                 } else if (vehicle === 'Máquina de Pulverizar') {
-                    equipmentLabel.innerText = "Identificação da Máquina";
+                    equipmentLabel.innerHTML = '<i data-lucide="tag" class="w-3 h-3"></i> Identificação da Máquina';
                     equipmentNumber.innerHTML += `
                         <option value="Máquina de Pulverizar - FOSPG-1">Máquina de Pulverizar - FOSPG-1</option>
                         <option value="Máquina de Pulverizar - FOSPG-2">Máquina de Pulverizar - FOSPG-2</option>
                     `;
                 } else if (vehicle === 'Sistema de Fertirrigação') {
-                    equipmentLabel.innerText = "Identificação do Sistema";
+                    equipmentLabel.innerHTML = '<i data-lucide="tag" class="w-3 h-3"></i> Identificação do Sistema';
                     equipmentNumber.innerHTML += `
                         <option value="Sistema de Fertirrigação - Iponia">Sistema de Fertirrigação - Iponia</option>
                     `;
-                } else if (vehicle === 'Equipamentos do Trator') {
-                    equipmentLabel.innerText = "Selecione o Equipamento";
+                } else if (vehicle === 'Implementos do Trator') {
+                    equipmentLabel.innerHTML = '<i data-lucide="tag" class="w-3 h-3"></i> Selecione o Equipamento';
                     equipmentNumber.innerHTML += `
                         <option value="Roçadeira Trator">Roçadeira Trator</option>
                         <option value="Grade Arado">Grade Arado</option>
@@ -619,7 +859,7 @@
                     `;
                 }
             } else {
-                driverLabel.innerText = "Motorista";
+                driverLabel.innerHTML = '<i data-lucide="user" class="w-3 h-3"></i> Motorista';
                 document.getElementById('driverSelect').options[0].text = "Selecione o motorista...";
                 document.getElementById('previewVehicleLabel').innerText = "Veículo";
                 
@@ -629,11 +869,12 @@
                 equipmentNumber.value = ''; // Reseta a identificação escolhida
             }
             
-            if (vehicle === 'Equipamentos do Trator') {
-                renderChecklist(null); // Aguarda o usuário selecionar no sub-menu
+            if (vehicle === 'Implementos do Trator') {
+                renderChecklist(null);
             } else {
                 renderChecklist(vehicle);
             }
+            lucide.createIcons();
         }
 
         // Atualiza a visualização do cartão da direita em tempo real
@@ -656,54 +897,95 @@
             document.getElementById('previewDriver').innerText = driver;
             document.getElementById('previewVehicle').innerText = vehicle || '---';
 
+            const iconContainer = document.getElementById('previewVehicleIconContainer');
+            if (iconContainer) iconContainer.innerHTML = getVehicleIconHtml(baseVehicle, vehicle || '');
+
             const previewContent = document.getElementById('previewContent');
             const previewStatus = document.getElementById('previewStatus');
-            
+            const previewStatsRow = document.getElementById('previewStatsRow');
+
             let activeChecklistKey = baseVehicle;
-            if (baseVehicle === 'Equipamentos do Trator') {
+            if (baseVehicle === 'Implementos do Trator') {
                 activeChecklistKey = equipmentSelect;
             }
 
             if (!activeChecklistKey || !checklistData[activeChecklistKey]) {
-                previewContent.innerHTML = `<div class="text-center text-slate-400 text-xs italic py-10 my-auto">O checklist aparecerá aqui assim que você selecionar um veículo e iniciar o preenchimento.</div>`;
-                previewStatus.className = "px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-400";
+                previewContent.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-14 text-center px-6">
+                        <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+                            <i data-lucide="clipboard" class="w-8 h-8 text-slate-300"></i>
+                        </div>
+                        <p class="text-slate-400 text-sm font-medium">Selecione um veículo para visualizar o checklist aqui.</p>
+                    </div>`;
+                previewStatus.className = "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-400";
                 previewStatus.innerText = "Pendente";
+                previewStatsRow.classList.add('hidden');
                 return;
             }
 
             // Coletar respostas
             let allAnswered = true;
             let hasIssues = false;
-            
-            // Layout dinâmico que se ajusta ao conteúdo, sem esticar os itens
-            let checklistResultsHtml = `<div class="flex flex-col gap-4 w-full">`;
-            
+            let countOk = 0, countNok = 0, countPending = 0, totalItems = 0;
+
             checklistData[activeChecklistKey].forEach((group, groupIdx) => {
-                checklistResultsHtml += `<div class="bg-slate-50 rounded-xl p-4 border border-slate-200 shadow-sm"><h4 class="text-[11px] font-black text-slate-400 uppercase mb-3">${group.category}</h4><ul class="space-y-2.5">`;
-                
+                group.items.forEach((item, itemIdx) => {
+                    totalItems++;
+                    const inputName = `chk_${groupIdx}_${itemIdx}`;
+                    const checkedOption = document.querySelector(`input[name="${inputName}"]:checked`);
+                    if (!checkedOption) { allAnswered = false; countPending++; }
+                    else if (checkedOption.value === 'OK') countOk++;
+                    else { hasIssues = true; countNok++; }
+                });
+            });
+
+            // Stats pills
+            previewStatsRow.classList.remove('hidden');
+            document.getElementById('statOk').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${countOk} OK`;
+            document.getElementById('statNok').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> ${countNok} NOK`;
+            document.getElementById('statPending').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg> ${countPending} pend.`;
+
+            // Progress bar
+            const answered = countOk + countNok;
+            const pct = totalItems > 0 ? Math.round((answered / totalItems) * 100) : 0;
+            const progressFill = document.getElementById('progressFill');
+            const progressLabel = document.getElementById('progressLabel');
+            if (progressFill) { progressFill.style.width = pct + '%'; }
+            if (progressLabel) { progressLabel.innerText = `${answered} / ${totalItems}`; }
+
+            // Build preview HTML
+            let checklistResultsHtml = `<div class="flex flex-col gap-3 w-full">`;
+
+            checklistData[activeChecklistKey].forEach((group, groupIdx) => {
+                const colorClass = categoryColors[groupIdx % categoryColors.length];
+                checklistResultsHtml += `
+                    <div style="border-radius:12px;overflow:hidden;border:1.5px solid #e2e8f0;">
+                        <div class="cat-header ${colorClass}" style="padding:7px 12px;">
+                            <span style="color:white;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.07em;">${group.category}</span>
+                        </div>
+                        <ul style="background:#fff;">`;
+
                 group.items.forEach((item, itemIdx) => {
                     const inputName = `chk_${groupIdx}_${itemIdx}`;
                     const checkedOption = document.querySelector(`input[name="${inputName}"]:checked`);
-                    
+
                     if (!checkedOption) {
-                        allAnswered = false;
                         checklistResultsHtml += `
-                            <li class="flex items-start gap-3 text-sm">
-                                <i data-lucide="minus" class="w-5 h-5 text-slate-300 shrink-0 stroke-[3]"></i>
-                                <span class="text-slate-400 font-medium">${item}</span>
+                            <li style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #f1f5f9;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span style="font-size:12px;color:#94a3b8;font-weight:500;">${item}</span>
                             </li>`;
                     } else if (checkedOption.value === 'OK') {
                         checklistResultsHtml += `
-                            <li class="flex items-start gap-3 text-sm">
-                                <i data-lucide="check" class="w-5 h-5 text-green-600 shrink-0 stroke-[3]"></i>
-                                <span class="text-slate-700 font-bold">${item}</span>
+                            <li style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #f1f5f9;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span style="font-size:12px;color:#1e293b;font-weight:700;">${item}</span>
                             </li>`;
                     } else {
-                        hasIssues = true;
                         checklistResultsHtml += `
-                            <li class="flex items-start gap-3 text-sm font-bold text-red-600 bg-red-50 p-2 rounded-lg border border-red-100">
-                                <i data-lucide="x" class="w-5 h-5 shrink-0 stroke-[3]"></i>
-                                <span>${getFriendlyDefectName(item)}</span>
+                            <li style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #fee2e2;background:#fef2f2;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span style="font-size:12px;color:#b91c1c;font-weight:800;">${getFriendlyDefectName(item)}</span>
                             </li>`;
                     }
                 });
@@ -713,14 +995,14 @@
 
             // Atualizar Status Badge
             if (!allAnswered) {
-                previewStatus.className = "px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider bg-amber-100 text-amber-600";
+                previewStatus.className = "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-600";
                 previewStatus.innerText = "Em Preenchimento";
             } else if (hasIssues) {
-                previewStatus.className = "px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider bg-red-100 text-red-600";
-                previewStatus.innerHTML = '<span class="flex items-center justify-center gap-1 text-center"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Requer Atenção</span>';
+                previewStatus.className = "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-600";
+                previewStatus.innerHTML = '<span style="display:flex;align-items:center;gap:4px;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Requer Atenção</span>';
             } else {
-                previewStatus.className = "px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider bg-green-100 text-green-700";
-                previewStatus.innerHTML = '<span class="flex items-center gap-1"><i data-lucide="check-check" class="w-3.5 h-3.5"></i> Apto para uso</span>';
+                previewStatus.className = "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-green-100 text-green-700";
+                previewStatus.innerHTML = '<span style="display:flex;align-items:center;gap:4px;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline><polyline points="20 6 9 17 4 12"></polyline></svg> Apto para uso</span>';
             }
 
             // Observações
@@ -820,7 +1102,7 @@
             // Validar se todos os radios foram marcados
             const vehicle = document.getElementById('vehicleSelect').value;
             let activeChecklistKey = vehicle;
-            if (vehicle === 'Equipamentos do Trator') {
+            if (vehicle === 'Implementos do Trator') {
                 activeChecklistKey = document.getElementById('equipmentNumber').value;
             }
 
@@ -941,7 +1223,7 @@
                 let hasIssues = false;
                 
                 let activeChecklistKey = baseVehicle;
-                if (baseVehicle === 'Equipamentos do Trator') {
+                if (baseVehicle === 'Implementos do Trator') {
                     activeChecklistKey = document.getElementById('equipmentNumber').value;
                 }
                 
@@ -1116,6 +1398,77 @@
         }
         
         function hideMessageModal() { document.getElementById('messageModal').classList.add('hidden'); }
+
+        // PWA Install
+        let deferredInstallPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            const btn = document.getElementById('installAppBtn');
+            btn.classList.remove('hidden');
+            btn.classList.add('flex');
+        });
+
+        async function installApp() {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                const btn = document.getElementById('installAppBtn');
+                btn.classList.add('hidden');
+                btn.classList.remove('flex');
+            }
+            deferredInstallPrompt = null;
+        }
+
+        window.addEventListener('appinstalled', () => {
+            const btn = document.getElementById('installAppBtn');
+            btn.classList.add('hidden');
+            btn.classList.remove('flex');
+            deferredInstallPrompt = null;
+        });
+
+        // PWA Brand Assets
+        const BRAND_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#0f172a"/>
+  <rect x="40" y="40" width="432" height="432" rx="60" fill="#1e293b"/>
+  <text x="256" y="230" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="155" font-weight="900" fill="#759587">SPG</text>
+  <rect x="60" y="265" width="392" height="3" fill="#759587" opacity="0.4"/>
+  <text x="256" y="330" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" letter-spacing="8" fill="#9db8ad">SEDE</text>
+  <text x="256" y="385" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="500" letter-spacing="3" fill="#5e7b6d">FROTA &amp; EQUIPAMENTOS</text>
+</svg>`.trim();
+
+        function getBrandLogoDataUri() {
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(BRAND_LOGO_SVG)}`;
+        }
+
+        function applyBrandAssets() {
+            const logoUri = getBrandLogoDataUri();
+            const favicon = document.getElementById('siteFavicon');
+            const appleTouchIcon = document.getElementById('siteAppleTouchIcon');
+            const manifestLink = document.getElementById('siteManifest');
+
+            if (favicon) favicon.href = logoUri;
+            if (appleTouchIcon) appleTouchIcon.href = logoUri;
+            if (manifestLink) {
+                const manifest = {
+                    name: 'Checklist SPG',
+                    short_name: 'SPG',
+                    start_url: '.',
+                    display: 'standalone',
+                    background_color: '#0f172a',
+                    theme_color: '#759587',
+                    icons: [
+                        { src: logoUri, sizes: '192x192', type: 'image/svg+xml' },
+                        { src: logoUri, sizes: '512x512', type: 'image/svg+xml' }
+                    ]
+                };
+                manifestLink.href = `data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}`;
+            }
+        }
+
+        applyBrandAssets();
     </script>
 </body>
 </html>
