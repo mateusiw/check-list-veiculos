@@ -1429,46 +1429,7 @@
             deferredInstallPrompt = null;
         });
 
-        // PWA Brand Assets
-        const BRAND_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="80" fill="#0f172a"/>
-  <rect x="40" y="40" width="432" height="432" rx="60" fill="#1e293b"/>
-  <text x="256" y="230" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="155" font-weight="900" fill="#759587">SPG</text>
-  <rect x="60" y="265" width="392" height="3" fill="#759587" opacity="0.4"/>
-  <text x="256" y="330" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" letter-spacing="8" fill="#9db8ad">SEDE</text>
-  <text x="256" y="385" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="500" letter-spacing="3" fill="#5e7b6d">FROTA &amp; EQUIPAMENTOS</text>
-</svg>`.trim();
 
-        function getBrandLogoDataUri() {
-            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(BRAND_LOGO_SVG)}`;
-        }
-
-        function applyBrandAssets() {
-            const logoUri = getBrandLogoDataUri();
-            const favicon = document.getElementById('siteFavicon');
-            const appleTouchIcon = document.getElementById('siteAppleTouchIcon');
-            const manifestLink = document.getElementById('siteManifest');
-
-            if (favicon) favicon.href = logoUri;
-            if (appleTouchIcon) appleTouchIcon.href = logoUri;
-            if (manifestLink) {
-                const manifest = {
-                    name: 'Checklist SPG',
-                    short_name: 'SPG',
-                    start_url: '.',
-                    display: 'standalone',
-                    background_color: '#0f172a',
-                    theme_color: '#759587',
-                    icons: [
-                        { src: logoUri, sizes: '192x192', type: 'image/svg+xml' },
-                        { src: logoUri, sizes: '512x512', type: 'image/svg+xml' }
-                    ]
-                };
-                manifestLink.href = `data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}`;
-            }
-        }
-
-        applyBrandAssets();
     </script>
 </body>
 </html>
