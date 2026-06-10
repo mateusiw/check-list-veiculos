@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Checklist de Diário SPG</title>
+    <title>Checklist de Veículos SPG</title>
     
     <!-- Ícones Modernos -->
     <link id="siteFavicon" rel="icon" type="image/png" href="https://i.imgur.com/NWM3Pth.png">
@@ -762,7 +762,7 @@
                                 <span class="text-[13px] text-slate-700 font-semibold pr-3 leading-snug">${item}</span>
                                 <div class="flex gap-2 shrink-0">
                                     <label class="cursor-pointer" title="OK">
-                                        <input type="radio" name="${inputName}" value="OK" class="sr-only check-radio ok-radio" onchange="updatePreview()" required>
+                                        <input type="radio" name="${inputName}" value="OK" class="sr-only check-radio ok-radio" onchange="updatePreview()">
                                         <div class="chk-btn chk-btn-ok">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                             OK
@@ -1105,23 +1105,6 @@
             let activeChecklistKey = vehicle;
             if (vehicle === 'Implementos do Trator') {
                 activeChecklistKey = document.getElementById('equipmentNumber').value;
-            }
-
-            let allChecked = true;
-            if(activeChecklistKey && checklistData[activeChecklistKey]){
-                checklistData[activeChecklistKey].forEach((group, groupIdx) => {
-                    group.items.forEach((item, itemIdx) => {
-                        const inputName = `chk_${groupIdx}_${itemIdx}`;
-                        if(!document.querySelector(`input[name="${inputName}"]:checked`)) {
-                            allChecked = false;
-                        }
-                    });
-                });
-            }
-
-            if(!allChecked) {
-                showMessageModal('Checklist Incompleto', 'Por favor, marque OK ou NOK para todos os itens da lista antes de enviar.', 'error');
-                return;
             }
 
             document.getElementById('confirmModal').classList.remove('hidden'); 
